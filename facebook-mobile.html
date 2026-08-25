@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Facebook — Mobile</title>
+  <style>
+    :root {
+      --fb-bg: #f0f2f5;
+      --fb-card: #ffffff;
+      --fb-border: #dddfe2;
+      --fb-text: #1c1e21;
+      --fb-muted: #65676b;
+      --fb-blue: #1877f2;
+      --fb-icon: #606770;
+      --td-green: #00A651;
+      --td-green-d: #007A3C;
+      --td-green-pale: #e8f7ef;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--fb-bg);
+      color: var(--fb-text);
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* ── TOP NAV ── */
+    .fb-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid var(--fb-border);
+      padding: 0 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .fb-logo { font-size: 28px; font-weight: 900; color: var(--fb-blue); letter-spacing: -1px; }
+    .fb-nav-icons { display: flex; gap: 8px; }
+    .fb-nav-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #e4e6eb; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 18px;
+    }
+
+    /* ── STORIES ── */
+    .stories-bar {
+      background: #fff; border-bottom: 1px solid var(--fb-border);
+      padding: 10px 0 10px 12px;
+      display: flex; gap: 10px; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .stories-bar::-webkit-scrollbar { display: none; }
+    .story {
+      flex-shrink: 0;
+      width: 66px;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .story-ring {
+      width: 60px; height: 60px; border-radius: 50%;
+      border: 3px solid var(--fb-blue);
+      padding: 2px;
+    }
+    .story-avatar {
+      width: 100%; height: 100%; border-radius: 50%;
+      object-fit: cover;
+      background: linear-gradient(135deg, #e4e6eb, #c9ccd3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .story-add { background: #e4e6eb; border: 3px solid #fff; font-size: 22px; }
+    .story-name { font-size: 11px; color: var(--fb-text); text-align: center; width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ── POST CREATE BAR ── */
+    .post-bar {
+      background: #fff; border-bottom: 8px solid var(--fb-bg);
+      padding: 12px;
+    }
+    .post-bar-inner { display: flex; align-items: center; gap: 10px; }
+    .post-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #e4e6eb, #c9ccd3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .post-input {
+      flex: 1; background: #f0f2f5; border: none; border-radius: 20px;
+      padding: 10px 14px; font-size: 15px; color: var(--fb-muted);
+      cursor: pointer;
+    }
+    .post-actions { display: flex; justify-content: space-around; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--fb-border); }
+    .post-action { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--fb-muted); padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+
+    /* ── FEED TABS ── */
+    .feed-tabs {
+      background: #fff;
+      display: flex;
+      border-bottom: 1px solid var(--fb-border);
+      margin-bottom: 8px;
+    }
+    .feed-tab {
+      flex: 1; text-align: center; padding: 14px 0; font-size: 13px;
+      font-weight: 600; color: var(--fb-muted); cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    .feed-tab.active { color: var(--fb-blue); border-bottom-color: var(--fb-blue); }
+
+    /* ── GENERIC POST ── */
+    .post {
+      background: var(--fb-card);
+      margin-bottom: 8px;
+      border-top: 1px solid var(--fb-border);
+      border-bottom: 1px solid var(--fb-border);
+    }
+    .post-header { display: flex; align-items: center; gap: 10px; padding: 12px 12px 8px; }
+    .post-header-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, #e4e6eb, #c9ccd3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0; overflow: hidden;
+    }
+    .post-header-info { flex: 1; }
+    .post-author { font-size: 14px; font-weight: 700; }
+    .post-meta { font-size: 12px; color: var(--fb-muted); display: flex; align-items: center; gap: 4px; }
+    .post-more { font-size: 22px; color: var(--fb-muted); cursor: pointer; padding: 0 4px; }
+    .post-body { padding: 0 12px 10px; font-size: 15px; line-height: 1.5; }
+    .post-image {
+      width: 100%; aspect-ratio: 4/3;
+      object-fit: cover;
+      background: linear-gradient(135deg, #e9ebee 0%, #d8dadf 100%);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .post-reactions {
+      padding: 8px 12px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; color: var(--fb-muted);
+    }
+    .reaction-icons { display: flex; gap: -4px; }
+    .reaction-icon { font-size: 16px; }
+    .post-actions-bar {
+      display: flex; justify-content: space-around;
+      padding: 4px 0; border-top: 1px solid var(--fb-border);
+    }
+    .post-action-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 12px; border-radius: 6px; cursor: pointer;
+      font-size: 14px; font-weight: 600; color: var(--fb-muted);
+      flex: 1; justify-content: center;
+    }
+    .post-action-btn:active { background: #f0f2f5; }
+
+    /* ── DUMMY POST IMAGES ── */
+    .dummy-img {
+      width: 100%; height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
+    }
+    .dummy-img.cars { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+    .dummy-img.food { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
+    .dummy-img.friends { background: linear-gradient(135deg, #d4fc79, #96e6a1); }
+    .dummy-img.news { background: linear-gradient(135deg, #fbc2eb, #a18cd1); }
+
+    /* ── SPONSORED / AD LABEL ── */
+    .sponsored-tag {
+      font-size: 12px; color: var(--fb-muted);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .sponsored-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--fb-muted); }
+
+    /* ═══════════════════════════════════════════════════
+       TD EASY SWITCH AD CARD
+    ═══════════════════════════════════════════════════ */
+    .td-ad {
+      background: var(--fb-card);
+      margin-bottom: 8px;
+      border-top: 1px solid var(--fb-border);
+      border-bottom: 1px solid var(--fb-border);
+    }
+    .td-ad-header { display: flex; align-items: center; gap: 10px; padding: 12px 12px 8px; }
+    .td-logo-bubble {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--td-green);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .td-logo-text { color: #fff; font-size: 16px; font-weight: 900; letter-spacing: -1px; }
+
+    /* AD HERO IMAGE */
+    .td-ad-hero {
+      width: 100%;
+      background: linear-gradient(160deg, #00A651 0%, #007A3C 55%, #004d26 100%);
+      padding: 28px 20px 24px;
+      position: relative; overflow: hidden;
+    }
+    .td-ad-hero::before {
+      content: '';
+      position: absolute; top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.06); border-radius: 50%;
+    }
+    .td-ad-hero::after {
+      content: '';
+      position: absolute; bottom: -60px; left: -30px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.04); border-radius: 50%;
+    }
+    .td-ad-eyebrow {
+      display: inline-block;
+      background: rgba(255,255,255,0.2); color: #fff;
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .td-ad-headline {
+      color: #fff; font-size: 22px; font-weight: 800; line-height: 1.25;
+      margin-bottom: 8px; position: relative; z-index: 1;
+    }
+    .td-ad-subhead {
+      color: rgba(255,255,255,0.85); font-size: 14px; line-height: 1.5;
+      margin-bottom: 18px; position: relative; z-index: 1;
+    }
+    .td-ad-steps {
+      display: flex; gap: 8px; margin-bottom: 20px;
+      position: relative; z-index: 1;
+    }
+    .td-ad-step {
+      flex: 1; background: rgba(255,255,255,0.15); border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+    }
+    .td-ad-step-icon { font-size: 20px; margin-bottom: 4px; }
+    .td-ad-step-label { font-size: 10px; color: rgba(255,255,255,0.9); font-weight: 600; line-height: 1.3; }
+
+    /* AD CTA STRIP */
+    .td-ad-cta-strip {
+      background: #fff; border-top: 1px solid var(--fb-border);
+      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .td-ad-cta-info { flex: 1; }
+    .td-ad-cta-url { font-size: 11px; color: var(--fb-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .td-ad-cta-title { font-size: 15px; font-weight: 700; color: var(--fb-text); }
+    .td-ad-cta-desc { font-size: 13px; color: var(--fb-muted); }
+    .td-ad-cta-btn {
+      background: var(--fb-blue); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 9px 16px; font-size: 14px; font-weight: 700;
+      cursor: pointer; white-space: nowrap; margin-left: 12px;
+    }
+    .td-ad-cta-btn:active { background: #1568d3; }
+
+    /* ── UPLOAD MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.5);
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: #fff; width: 100%; max-width: 480px;
+      border-radius: 20px 20px 0 0;
+      padding: 0 0 32px;
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+    .modal-handle {
+      width: 36px; height: 4px; background: #dddfe2; border-radius: 2px;
+      margin: 12px auto 20px;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px 16px;
+      border-bottom: 1px solid var(--fb-border);
+    }
+    .modal-title { font-size: 18px; font-weight: 800; }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #e4e6eb; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--fb-text);
+    }
+    .modal-body { padding: 20px; }
+    .modal-section { margin-bottom: 20px; }
+    .modal-label { font-size: 13px; font-weight: 700; color: var(--fb-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .modal-input {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid var(--fb-border); border-radius: 10px;
+      font-size: 15px; font-family: var(--font);
+      background: #fff; color: var(--fb-text);
+      transition: border-color .15s;
+    }
+    .modal-input:focus { outline: none; border-color: var(--td-green); }
+    .contact-pref { display: flex; gap: 8px; margin-bottom: 12px; }
+    .pref-btn {
+      flex: 1; padding: 10px; border-radius: 10px;
+      border: 1.5px solid var(--fb-border); background: #fff;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all .15s; color: var(--fb-text);
+    }
+    .pref-btn.active { border-color: var(--td-green); background: var(--td-green-pale); color: var(--td-green-d); }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed var(--fb-border); border-radius: 14px;
+      padding: 28px 20px; text-align: center;
+      background: #fafafa; cursor: pointer;
+      transition: all .2s;
+      position: relative;
+    }
+    .drop-zone.drag-over { border-color: var(--td-green); background: var(--td-green-pale); }
+    .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .drop-icon { font-size: 36px; margin-bottom: 10px; }
+    .drop-title { font-size: 15px; font-weight: 700; color: var(--fb-text); margin-bottom: 4px; }
+    .drop-sub { font-size: 13px; color: var(--fb-muted); }
+    .drop-types { display: flex; justify-content: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .drop-type { background: #e4e6eb; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--fb-muted); }
+    .file-preview { display: none; align-items: center; gap: 10px; padding: 12px; background: var(--td-green-pale); border-radius: 10px; margin-top: 10px; }
+    .file-preview.show { display: flex; }
+    .file-preview-icon { font-size: 28px; }
+    .file-preview-info { flex: 1; }
+    .file-preview-name { font-size: 14px; font-weight: 700; color: var(--fb-text); }
+    .file-preview-size { font-size: 12px; color: var(--fb-muted); }
+    .file-remove { font-size: 18px; cursor: pointer; color: var(--fb-muted); }
+
+    .submit-btn {
+      width: 100%; padding: 16px;
+      background: var(--td-green); color: #fff;
+      border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 800; cursor: pointer;
+      transition: background .15s;
+      margin-top: 4px;
+    }
+    .submit-btn:active { background: var(--td-green-d); }
+    .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+    .fine-print { font-size: 11px; color: var(--fb-muted); text-align: center; margin-top: 12px; line-height: 1.5; }
+
+    /* ── SUCCESS STATE ── */
+    .success-screen {
+      display: none; padding: 24px 20px;
+    }
+    .success-screen.show { display: block; }
+    .modal-body.hidden { display: none; }
+    .success-check { text-align: center; margin-bottom: 20px; }
+    .success-check-icon { font-size: 56px; animation: popIn .4s ease; }
+    @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+    .success-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+    .success-sub { font-size: 14px; color: var(--fb-muted); text-align: center; margin-bottom: 20px; }
+    .extracted-card {
+      background: #f9fafb; border: 1.5px solid var(--fb-border);
+      border-radius: 14px; overflow: hidden; margin-bottom: 16px;
+    }
+    .extracted-header {
+      background: var(--td-green); color: #fff;
+      padding: 10px 14px; font-size: 13px; font-weight: 700;
+    }
+    .extracted-row { display: flex; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--fb-border); font-size: 14px; }
+    .extracted-row:last-child { border-bottom: none; }
+    .extracted-key { color: var(--fb-muted); font-weight: 500; }
+    .extracted-val { font-weight: 700; color: var(--fb-text); text-align: right; max-width: 55%; }
+    .confirm-btns { display: flex; gap: 10px; margin-top: 8px; }
+    .btn-no { flex: 1; padding: 14px; border: 1.5px solid var(--fb-border); background: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; color: var(--fb-text); }
+    .btn-yes { flex: 2; padding: 14px; background: var(--td-green); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .btn-yes:active { background: var(--td-green-d); }
+
+    /* Quote request sent */
+    .quote-sent { display: none; padding: 32px 20px; text-align: center; }
+    .quote-sent.show { display: block; }
+    .call-icon { font-size: 64px; margin-bottom: 16px; animation: ring .6s ease infinite alternate; }
+    @keyframes ring {
+      from { transform: rotate(-8deg); }
+      to   { transform: rotate(8deg); }
+    }
+    .quote-sent-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .quote-sent-sub { font-size: 15px; color: var(--fb-muted); line-height: 1.6; }
+    .td-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--td-green-pale); color: var(--td-green-d); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 700; margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ FACEBOOK MOBILE NAV ══ -->
+  <nav class="fb-nav">
+    <div class="fb-logo">f</div>
+    <div class="fb-nav-icons">
+      <div class="fb-nav-icon">🔍</div>
+      <div class="fb-nav-icon">💬</div>
+      <div class="fb-nav-icon">🔔</div>
+    </div>
+  </nav>
+
+  <!-- ══ STORIES ══ -->
+  <div class="stories-bar">
+    <div class="story">
+      <div class="story-ring" style="border-color:#e4e6eb;">
+        <div class="story-avatar story-add">➕</div>
+      </div>
+      <span class="story-name">Add Story</span>
+    </div>
+    <div class="story">
+      <div class="story-ring">
+        <div class="story-avatar">👩</div>
+      </div>
+      <span class="story-name">Sarah M.</span>
+    </div>
+    <div class="story">
+      <div class="story-ring">
+        <div class="story-avatar">👨</div>
+      </div>
+      <span class="story-name">Mike T.</span>
+    </div>
+    <div class="story">
+      <div class="story-ring">
+        <div class="story-avatar">👩‍🦱</div>
+      </div>
+      <span class="story-name">Jessica</span>
+    </div>
+    <div class="story">
+      <div class="story-ring">
+        <div class="story-avatar">🧑</div>
+      </div>
+      <span class="story-name">Carlos</span>
+    </div>
+    <div class="story">
+      <div class="story-ring">
+        <div class="story-avatar">👩‍🦰</div>
+      </div>
+      <span class="story-name">Amanda</span>
+    </div>
+  </div>
+
+  <!-- ══ POST BAR ══ -->
+  <div class="post-bar">
+    <div class="post-bar-inner">
+      <div class="post-avatar">😊</div>
+      <div class="post-input">What's on your mind?</div>
+    </div>
+    <div class="post-actions">
+      <div class="post-action">📹 Live</div>
+      <div class="post-action">🖼️ Photo</div>
+      <div class="post-action">😊 Feeling</div>
+    </div>
+  </div>
+
+  <!-- ══ FEED TABS ══ -->
+  <div class="feed-tabs">
+    <div class="feed-tab active">Home</div>
+    <div class="feed-tab">Reels</div>
+    <div class="feed-tab">Marketplace</div>
+  </div>
+
+  <!-- ══ POST 1 ══ -->
+  <div class="post">
+    <div class="post-header">
+      <div class="post-header-avatar">👨‍👩‍👧</div>
+      <div class="post-header-info">
+        <div class="post-author">David Leblanc</div>
+        <div class="post-meta">2 hrs · 🌐</div>
+      </div>
+      <div class="post-more">···</div>
+    </div>
+    <div class="post-body">Just got back from the cottage — what an amazing long weekend! The drive up was smooth and the weather was perfect 🌞🍁 Nothing better than Canadian summer.</div>
+    <div class="dummy-img friends">🏕️</div>
+    <div class="post-reactions">
+      <span><span class="reaction-icon">👍</span><span class="reaction-icon">❤️</span><span class="reaction-icon">😆</span> 142</span>
+      <span>18 comments · 4 shares</span>
+    </div>
+    <div class="post-actions-bar">
+      <div class="post-action-btn">👍 Like</div>
+      <div class="post-action-btn">💬 Comment</div>
+      <div class="post-action-btn">↗️ Share</div>
+    </div>
+  </div>
+
+  <!-- ══ POST 2 ══ -->
+  <div class="post">
+    <div class="post-header">
+      <div class="post-header-avatar">🍕</div>
+      <div class="post-header-info">
+        <div class="post-author">Toronto Foodies</div>
+        <div class="post-meta">4 hrs · 🌐</div>
+      </div>
+      <div class="post-more">···</div>
+    </div>
+    <div class="post-body">New ramen spot just opened on Queen West and it's 🔥🍜 The broth is incredible — went twice already this week. DM for the address!</div>
+    <div class="dummy-img food">🍜</div>
+    <div class="post-reactions">
+      <span><span class="reaction-icon">❤️</span><span class="reaction-icon">😋</span><span class="reaction-icon">👍</span> 318</span>
+      <span>47 comments</span>
+    </div>
+    <div class="post-actions-bar">
+      <div class="post-action-btn">👍 Like</div>
+      <div class="post-action-btn">💬 Comment</div>
+      <div class="post-action-btn">↗️ Share</div>
+    </div>
+  </div>
+
+  <!-- ══ POST 3 ══ -->
+  <div class="post">
+    <div class="post-header">
+      <div class="post-header-avatar">🚗</div>
+      <div class="post-header-info">
+        <div class="post-author">Canadian Car Enthusiasts</div>
+        <div class="post-meta">5 hrs · 🌐</div>
+      </div>
+      <div class="post-more">···</div>
+    </div>
+    <div class="post-body">2025 model year deals are getting crazy. Anyone else shopping around for auto insurance before year-end? I just found out I was overpaying by $600/year 😤</div>
+    <div class="dummy-img cars">🚗</div>
+    <div class="post-reactions">
+      <span><span class="reaction-icon">😤</span><span class="reaction-icon">👍</span> 89</span>
+      <span>23 comments · 11 shares</span>
+    </div>
+    <div class="post-actions-bar">
+      <div class="post-action-btn">👍 Like</div>
+      <div class="post-action-btn">💬 Comment</div>
+      <div class="post-action-btn">↗️ Share</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       ✨ TD EASY SWITCH AD ✨
+  ════════════════════════════════════════════════ -->
+  <div class="td-ad" id="td-ad">
+    <div class="td-ad-header">
+      <div class="td-logo-bubble">
+        <span class="td-logo-text">TD</span>
+      </div>
+      <div class="post-header-info">
+        <div class="post-author">TD Insurance</div>
+        <div class="post-meta">
+          <span class="sponsored-tag">Sponsored <span class="sponsored-dot"></span> 🌐</span>
+        </div>
+      </div>
+      <div class="post-more">···</div>
+    </div>
+
+    <!-- Hero creative -->
+    <div class="td-ad-hero">
+      <div class="td-ad-eyebrow">🍁 Exclusive Offer</div>
+      <div class="td-ad-headline">Switch to TD Insurance in 60 seconds.</div>
+      <div class="td-ad-subhead">Just upload your pink slip. We'll read your current policy and build your quote automatically — no forms, no hassle.</div>
+      <div class="td-ad-steps">
+        <div class="td-ad-step">
+          <div class="td-ad-step-icon">📸</div>
+          <div class="td-ad-step-label">Upload your policy</div>
+        </div>
+        <div class="td-ad-step">
+          <div class="td-ad-step-icon">⚡</div>
+          <div class="td-ad-step-label">We scan it instantly</div>
+        </div>
+        <div class="td-ad-step">
+          <div class="td-ad-step-icon">📞</div>
+          <div class="td-ad-step-label">Advisor calls you</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA strip -->
+    <div class="td-ad-cta-strip">
+      <div class="td-ad-cta-info">
+        <div class="td-ad-cta-url">tdinsurance.com</div>
+        <div class="td-ad-cta-title">TD Easy Switch</div>
+        <div class="td-ad-cta-desc">Get your personalized quote now</div>
+      </div>
+      <button class="td-ad-cta-btn" onclick="openModal()">Get Quote</button>
+    </div>
+
+    <!-- Reactions -->
+    <div class="post-reactions">
+      <span><span class="reaction-icon">👍</span><span class="reaction-icon">❤️</span> 2,841</span>
+      <span>194 comments · 567 shares</span>
+    </div>
+    <div class="post-actions-bar">
+      <div class="post-action-btn">👍 Like</div>
+      <div class="post-action-btn">💬 Comment</div>
+      <div class="post-action-btn">↗️ Share</div>
+    </div>
+  </div>
+
+  <!-- ══ POST 4 (below ad) ══ -->
+  <div class="post">
+    <div class="post-header">
+      <div class="post-header-avatar">📰</div>
+      <div class="post-header-info">
+        <div class="post-author">CBC News</div>
+        <div class="post-meta">6 hrs · 🌐</div>
+      </div>
+      <div class="post-more">···</div>
+    </div>
+    <div class="post-body">Ontario auto insurance rates: what's changing in 2025 and how to make sure you're not overpaying →</div>
+    <div class="dummy-img news">📰</div>
+    <div class="post-reactions">
+      <span><span class="reaction-icon">😮</span><span class="reaction-icon">👍</span> 1,203</span>
+      <span>445 comments · 288 shares</span>
+    </div>
+    <div class="post-actions-bar">
+      <div class="post-action-btn">👍 Like</div>
+      <div class="post-action-btn">💬 Comment</div>
+      <div class="post-action-btn">↗️ Share</div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       UPLOAD MODAL (bottom sheet)
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+
+      <!-- FORM BODY -->
+      <div id="modal-form">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">TD Easy Switch</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-section">
+            <div class="modal-label">Your Name</div>
+            <div style="display:flex;gap:8px;">
+              <input class="modal-input" type="text" placeholder="First name" id="fname" style="flex:1;" />
+              <input class="modal-input" type="text" placeholder="Last name" id="lname" style="flex:1;" />
+            </div>
+          </div>
+          <div class="modal-section">
+            <div class="modal-label">Preferred Contact</div>
+            <div class="contact-pref">
+              <button class="pref-btn active" id="pref-sms" onclick="setPref('sms')">📱 SMS</button>
+              <button class="pref-btn" id="pref-email" onclick="setPref('email')">✉️ Email</button>
+            </div>
+            <input class="modal-input" type="tel" id="contact-value" placeholder="Mobile number" />
+          </div>
+          <div class="modal-section">
+            <div class="modal-label">Upload Your Policy Document</div>
+            <div class="drop-zone" id="drop-zone">
+              <input type="file" accept="image/*,.pdf" id="file-input" onchange="handleFile(this.files[0])" />
+              <div class="drop-icon">📄</div>
+              <div class="drop-title">Tap to upload your pink slip or policy</div>
+              <div class="drop-sub">Photo, scan, or PDF — we handle it all</div>
+              <div class="drop-types">
+                <span class="drop-type">JPG</span>
+                <span class="drop-type">PNG</span>
+                <span class="drop-type">PDF</span>
+                <span class="drop-type">HEIC</span>
+              </div>
+            </div>
+            <div class="file-preview" id="file-preview">
+              <div class="file-preview-icon" id="file-icon">📄</div>
+              <div class="file-preview-info">
+                <div class="file-preview-name" id="file-name">document.pdf</div>
+                <div class="file-preview-size" id="file-size">2.3 MB · Ready to upload</div>
+              </div>
+              <div class="file-remove" onclick="removeFile()">✕</div>
+            </div>
+          </div>
+          <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>Scan My Policy & Get a Quote</button>
+          <div class="fine-print">By submitting, you agree to be contacted by a TD Insurance advisor. Your document is securely processed and not stored.</div>
+        </div>
+      </div>
+
+      <!-- SUCCESS / EXTRACTED DATA -->
+      <div class="success-screen" id="success-screen">
+        <div class="success-check">
+          <div class="success-check-icon">✅</div>
+        </div>
+        <div class="success-title">Policy Scanned!</div>
+        <div class="success-sub">Here's what we found. Please confirm this looks correct.</div>
+        <div class="extracted-card">
+          <div class="extracted-header">👤 Personal Information</div>
+          <div class="extracted-row"><span class="extracted-key">Name</span><span class="extracted-val" id="ex-name">—</span></div>
+          <div class="extracted-row"><span class="extracted-key">Address</span><span class="extracted-val">42 Maple Ave, Toronto ON</span></div>
+        </div>
+        <div class="extracted-card">
+          <div class="extracted-header">🚗 Vehicle</div>
+          <div class="extracted-row"><span class="extracted-key">Vehicle</span><span class="extracted-val">2021 Honda Civic</span></div>
+          <div class="extracted-row"><span class="extracted-key">VIN</span><span class="extracted-val">2HGFE2F59MH...</span></div>
+        </div>
+        <div class="extracted-card">
+          <div class="extracted-header">🛡️ Current Coverage</div>
+          <div class="extracted-row"><span class="extracted-key">Insurer</span><span class="extracted-val">Aviva Canada</span></div>
+          <div class="extracted-row"><span class="extracted-key">Coverage</span><span class="extracted-val">Comprehensive</span></div>
+          <div class="extracted-row"><span class="extracted-key">Liability</span><span class="extracted-val">$2,000,000</span></div>
+          <div class="extracted-row"><span class="extracted-key">Policy Expires</span><span class="extracted-val">Mar 15, 2026</span></div>
+        </div>
+        <div class="success-sub" style="margin-top:4px;">Would you like a TD quote based on this information?</div>
+        <div class="confirm-btns">
+          <button class="btn-no" onclick="closeModal()">No thanks</button>
+          <button class="btn-yes" onclick="requestQuote()">✅ Yes, get my quote</button>
+        </div>
+      </div>
+
+      <!-- QUOTE REQUESTED -->
+      <div class="quote-sent" id="quote-sent">
+        <div class="call-icon">📞</div>
+        <div class="quote-sent-title">Your quote is ready!</div>
+        <div class="quote-sent-sub">A TD Insurance advisor will be calling you shortly to walk through your personalized quote.</div>
+        <div class="td-badge">
+          <span style="background:var(--td-green);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;">TD</span>
+          Secure · No obligation · 2 min call
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedPref = 'sms';
+    let selectedFile = null;
+
+    function openModal() {
+      document.getElementById('modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function setPref(pref) {
+      selectedPref = pref;
+      document.getElementById('pref-sms').classList.toggle('active', pref === 'sms');
+      document.getElementById('pref-email').classList.toggle('active', pref === 'email');
+      const input = document.getElementById('contact-value');
+      if (pref === 'sms') { input.type = 'tel'; input.placeholder = 'Mobile number'; }
+      else { input.type = 'email'; input.placeholder = 'Email address'; }
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      selectedFile = file;
+      const icons = { 'application/pdf': '📋', 'image/jpeg': '🖼️', 'image/png': '🖼️', 'image/heic': '🖼️' };
+      document.getElementById('file-icon').textContent = icons[file.type] || '📄';
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-size').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB · Ready to upload';
+      document.getElementById('file-preview').classList.add('show');
+      document.getElementById('submit-btn').disabled = false;
+    }
+
+    function removeFile() {
+      selectedFile = null;
+      document.getElementById('file-preview').classList.remove('show');
+      document.getElementById('submit-btn').disabled = true;
+      document.getElementById('file-input').value = '';
+    }
+
+    function submitForm() {
+      const fname = document.getElementById('fname').value.trim() || 'John';
+      const lname = document.getElementById('lname').value.trim() || 'Smith';
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = '⏳ Scanning document...';
+      btn.disabled = true;
+
+      // Simulate OCR scan delay
+      setTimeout(() => {
+        document.getElementById('ex-name').textContent = fname + ' ' + lname;
+        document.getElementById('modal-form').style.display = 'none';
+        document.getElementById('success-screen').classList.add('show');
+      }, 2200);
+    }
+
+    function requestQuote() {
+      document.getElementById('success-screen').classList.remove('show');
+      document.getElementById('quote-sent').classList.add('show');
+    }
+
+    // Drag-over styling
+    const dz = document.getElementById('drop-zone');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    // Close on overlay tap
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+</body>
+</html>

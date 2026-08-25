@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TD Easy Switch — Demo</title>
+  <style>
+    /* ============================================================
+       TOKENS
+    ============================================================ */
+    :root {
+      --td-green:      #00A651;
+      --td-green-d:    #007A3C;
+      --td-green-pale: #e8f7ef;
+      --td-green-mid:  #d1f0e0;
+      --fb-blue:       #1877f2;
+      --fb-blue-d:     #1558b0;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --transition: .2s ease;
+    }
+    :root, body.light {
+      --fb-bg:     #f0f2f5;
+      --fb-card:   #ffffff;
+      --fb-border: #dddfe2;
+      --fb-text:   #1c1e21;
+      --fb-muted:  #65676b;
+      --fb-input:  #f0f2f5;
+      --page-bg:   #e2e5e9;
+      --td-bg:     #f5f5f5;
+      --td-card:   #ffffff;
+      --td-text:   #1a1a1a;
+      --td-muted:  #555;
+      --td-border: #e0e0e0;
+      --td-input:  #fafafa;
+    }
+    body.dark {
+      --fb-bg:     #18191a;
+      --fb-card:   #242526;
+      --fb-border: #3a3b3c;
+      --fb-text:   #e4e6eb;
+      --fb-muted:  #b0b3b8;
+      --fb-input:  #3a3b3c;
+      --page-bg:   #111827;
+      --td-bg:     #0f172a;
+      --td-card:   #1e293b;
+      --td-text:   #f1f5f9;
+      --td-muted:  #94a3b8;
+      --td-border: #334155;
+      --td-input:  #0f172a;
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--page-bg);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      transition: background var(--transition);
+    }
+    body.desktop-mode { overflow: auto; align-items: flex-start; }
+
+    /* ============================================================
+       FLOATING CONTROLS PILL
+    ============================================================ */
+    #floating-controls {
+      position: fixed; top: 16px; right: 16px; z-index: 9999;
+      background: rgba(28,28,30,.92);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 999px; padding: 7px 14px; gap: 14px;
+      align-items: center; display: flex;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    }
+    body.light #floating-controls { background: rgba(255,255,255,.9); border-color: rgba(0,0,0,.12); box-shadow: 0 4px 20px rgba(0,0,0,.15); }
+    .fc-sep { width: 1px; height: 18px; background: rgba(255,255,255,.18); }
+    body.light .fc-sep { background: rgba(0,0,0,.12); }
+    .fc-label { font-size: 11px; font-weight: 600; color: #9ca3af; user-select: none; }
+    body.light .fc-label { color: #6b7280; }
+    .fc-toggle { position: relative; width: 40px; height: 22px; cursor: pointer; }
+    .fc-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .fc-track { position: absolute; inset: 0; background: rgba(127,127,127,.3); border-radius: 22px; transition: background .2s; }
+    .fc-knob  { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: #9ca3af; border-radius: 50%; transition: transform .2s, background .2s; display: flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; }
+    .fc-toggle input:checked ~ .fc-track { background: var(--td-green); }
+    .fc-toggle input:checked ~ .fc-knob  { transform: translateX(18px); background: #fff; }
+
+    /* ============================================================
+       MOBILE PHONE FRAME
+    ============================================================ */
+    #phone-stage {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 100vh;
+    }
+    #phone-bezel {
+      position: relative; width: 390px; height: 844px;
+      border-radius: 54px; background: #1c1c1e;
+      box-shadow: 0 0 0 2px #3a3a3c, 0 0 0 7px #1c1c1e, 0 0 0 9px #3a3a3c,
+                  0 40px 100px rgba(0,0,0,.8), inset 0 0 0 1px rgba(255,255,255,.07);
+      flex-shrink: 0; display: flex; flex-direction: column; padding: 12px;
+    }
+    #phone-bezel::before { content:""; position:absolute; left:-11px; top:140px; width:4px; height:36px; background:#3a3a3c; border-radius:2px 0 0 2px; box-shadow:0 54px 0 #3a3a3c,0 108px 0 #3a3a3c; }
+    #phone-bezel::after  { content:""; position:absolute; right:-11px; top:175px; width:4px; height:70px; background:#3a3a3c; border-radius:0 2px 2px 0; }
+    #phone-screen {
+      border-radius: 44px; overflow: hidden;
+      flex: 1; display: flex; flex-direction: column; position: relative;
+    }
+    #phone-island { position:absolute; top:10px; left:50%; transform:translateX(-50%); width:120px; height:32px; background:#000; border-radius:20px; z-index:300; pointer-events:none; display:flex; align-items:center; justify-content:center; gap:10px; }
+    #phone-island .cam { width:10px; height:10px; background:#1c1c1e; border-radius:50%; border:1.5px solid #2c2c2e; }
+    #phone-island .bar { width:28px; height:5px; background:#1c1c1e; border-radius:3px; }
+    #phone-statusbar { height:50px; flex-shrink:0; background:var(--fb-blue); display:flex; align-items:flex-end; justify-content:space-between; padding:0 22px 8px; z-index:5; transition:background .2s; }
+    #phone-statusbar.td-bar { background: #00843D; }
+    #phone-statusbar .st-time { font-size:13px; font-weight:700; color:#fff; }
+    #phone-statusbar .st-icons { font-size:12px; color:#fff; }
+    /* The swappable view area */
+    #phone-view {
+      flex:1; position:relative; overflow:hidden;
+      background: var(--fb-bg);
+    }
+    #phone-home { height:26px; background:var(--fb-card); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .2s; }
+    #phone-home div { width:110px; height:4px; background:var(--fb-text); opacity:.15; border-radius:2px; }
+
+    /* ============================================================
+       DESKTOP BROWSER FRAME
+    ============================================================ */
+    #desktop-stage {
+      display: none; width: 100%; min-height: 100vh; flex-direction: column;
+    }
+    .browser-chrome {
+      background: #2b2b2b; padding: 10px 16px 8px;
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+      position: sticky; top: 0; z-index: 200;
+    }
+    body.light .browser-chrome { background: #dee1e6; }
+    .browser-dots { display:flex; gap:6px; }
+    .browser-dot { width:12px; height:12px; border-radius:50%; }
+    .browser-dot.red    { background:#ff5f57; }
+    .browser-dot.yellow { background:#febc2e; }
+    .browser-dot.green  { background:#28c840; }
+    .browser-urlbar {
+      flex:1; background:#1c1c1e; border-radius:6px;
+      padding:5px 12px; font-size:13px; color:#b0b3b8;
+      display:flex; align-items:center; gap:6px;
+    }
+    body.light .browser-urlbar { background:#fff; color:#444; border:1px solid #ccc; }
+    #browser-url-text { flex:1; font-size:13px; }
+    /* the two swappable views in desktop */
+    #desktop-view { flex:1; }
+
+    /* ============================================================
+       SCREEN SLOTS — each "page" is a .screen div
+    ============================================================ */
+    .screen { display:none; width:100%; height:100%; }
+    .screen.active { display:block; }
+    /* Inside phone the screens need to fill + scroll */
+    #phone-view .screen { position:absolute; inset:0; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; }
+    #phone-view .screen::-webkit-scrollbar { display:none; }
+    /* Inside desktop the screens just flow normally */
+    #desktop-view .screen { height:auto; }
+
+    /* ============================================================
+       SHARED FACEBOOK COMPONENTS
+    ============================================================ */
+    .fb-topnav-mobile {
+      background: var(--fb-blue); height:56px; padding:0 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:50;
+    }
+    .fb-logo { font-size:30px; font-weight:900; color:#fff; letter-spacing:-1px; }
+    .fb-logo-desktop { font-size:36px; font-weight:900; color:var(--fb-blue); letter-spacing:-1px; }
+    .fb-nav-search-m { background:rgba(255,255,255,.2); border:none; border-radius:20px; padding:7px 12px; font-size:13px; color:#fff; width:140px; }
+    .fb-nav-search-m::placeholder { color:rgba(255,255,255,.7); }
+    .fb-nav-icons { display:flex; gap:8px; }
+    .fb-nav-icon { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; }
+
+    /* Stories */
+    .fb-stories { display:flex; gap:8px; padding:10px 12px; background:var(--fb-card); border-bottom:1px solid var(--fb-border); overflow-x:auto; scrollbar-width:none; }
+    .fb-stories::-webkit-scrollbar { display:none; }
+    .fb-story { flex-shrink:0; text-align:center; cursor:pointer; }
+    .fb-story-ring { width:56px; height:56px; border-radius:50%; border:3px solid var(--fb-blue); padding:2px; margin:0 auto 4px; }
+    .fb-story-ring.no-ring { border-color:transparent; }
+    .fb-story-img { width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; }
+    .fb-story-name { font-size:11px; color:var(--fb-text); width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    /* Composer */
+    .fb-composer { background:var(--fb-card); border-bottom:8px solid var(--fb-bg); padding:10px 12px; }
+    .fb-composer-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .fb-composer-avatar { width:38px; height:38px; border-radius:50%; overflow:hidden; flex-shrink:0; }
+    .fb-composer-avatar img { width:100%; height:100%; object-fit:cover; }
+    .fb-composer-box { flex:1; background:var(--fb-input); border:none; border-radius:20px; padding:9px 14px; font-size:15px; color:var(--fb-muted); cursor:pointer; }
+    .fb-composer-actions { display:flex; justify-content:space-around; border-top:1px solid var(--fb-border); padding-top:8px; }
+    .fb-composer-action { font-size:13px; font-weight:600; color:var(--fb-muted); cursor:pointer; padding:4px 8px; }
+
+    /* Posts */
+    .fb-post { background:var(--fb-card); border-top:1px solid var(--fb-border); border-bottom:1px solid var(--fb-border); margin-bottom:8px; }
+    .fb-post-header { display:flex; align-items:center; gap:10px; padding:10px 12px 6px; }
+    .fb-post-avatar { width:42px; height:42px; border-radius:50%; overflow:hidden; flex-shrink:0; }
+    .fb-post-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+    .fb-post-avatar.page-icon { border-radius:10px; }
+    .fb-post-author { font-size:14px; font-weight:700; color:var(--fb-text); }
+    .fb-post-meta { font-size:12px; color:var(--fb-muted); }
+    .fb-post-more { font-size:20px; color:var(--fb-muted); cursor:pointer; margin-left:auto; }
+    .fb-post-body { padding:2px 12px 10px; font-size:14px; line-height:1.55; color:var(--fb-text); }
+    .fb-post-img { width:100%; object-fit:cover; display:block; }
+    .fb-post-reactions { padding:6px 12px; font-size:13px; color:var(--fb-muted); display:flex; justify-content:space-between; }
+    .fb-post-actions { display:flex; border-top:1px solid var(--fb-border); }
+    .fb-post-action { flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:8px; font-size:13px; font-weight:600; color:var(--fb-muted); cursor:pointer; }
+    .fb-post-action:hover { background:var(--fb-input); }
+
+    /* TD Ad in feed */
+    .td-ad-hero {
+      background: linear-gradient(150deg, #00A651 0%, #007A3C 55%, #004d26 100%);
+      padding:28px 20px 22px; position:relative; overflow:hidden;
+    }
+    .td-ad-hero::before { content:''; position:absolute; top:-50px; right:-50px; width:200px; height:200px; background:rgba(255,255,255,.06); border-radius:50%; }
+    .td-ad-eyebrow { display:inline-block; background:rgba(255,255,255,.2); color:#fff; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:4px 10px; border-radius:20px; margin-bottom:12px; position:relative; z-index:1; }
+    .td-ad-headline { color:#fff; font-size:20px; font-weight:800; line-height:1.25; margin-bottom:8px; position:relative; z-index:1; }
+    .td-ad-subhead { color:rgba(255,255,255,.85); font-size:13px; line-height:1.55; margin-bottom:18px; position:relative; z-index:1; }
+    .td-ad-steps { display:flex; gap:8px; position:relative; z-index:1; }
+    .td-ad-step { flex:1; background:rgba(255,255,255,.15); border-radius:10px; padding:10px 6px; text-align:center; }
+    .td-ad-step-icon { font-size:20px; margin-bottom:4px; }
+    .td-ad-step-label { font-size:10px; color:rgba(255,255,255,.9); font-weight:600; line-height:1.3; }
+    .td-ad-cta-strip { background:var(--fb-card); border-top:1px solid var(--fb-border); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; }
+    .td-ad-cta-url { font-size:11px; color:var(--fb-muted); text-transform:uppercase; letter-spacing:.5px; }
+    .td-ad-cta-title { font-size:14px; font-weight:700; color:var(--fb-text); }
+    .td-ad-cta-desc { font-size:12px; color:var(--fb-muted); }
+    .td-ad-cta-btn { background:var(--fb-blue); color:#fff; border:none; border-radius:8px; padding:9px 16px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; margin-left:10px; transition:background .1s; }
+    .td-ad-cta-btn:hover { background:var(--fb-blue-d); }
+
+    /* Desktop nav */
+    .desktop-topnav { background:var(--fb-card); border-bottom:1px solid var(--fb-border); height:56px; padding:0 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+    .desktop-nav-search { background:var(--fb-input); border:none; border-radius:20px; padding:8px 16px; font-size:15px; color:var(--fb-text); width:220px; }
+    .desktop-nav-center { display:flex; gap:4px; }
+    .desktop-nav-tab { padding:0 26px; height:48px; display:flex; align-items:center; border-radius:8px; cursor:pointer; font-size:22px; color:var(--fb-muted); border-bottom:3px solid transparent; }
+    .desktop-nav-tab.active { color:var(--fb-blue); border-bottom-color:var(--fb-blue); }
+    .desktop-nav-right { display:flex; gap:8px; align-items:center; }
+    .desktop-nav-btn { width:40px; height:40px; border-radius:50%; background:var(--fb-input); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; }
+
+    /* Desktop 3-col */
+    .desktop-layout { display:flex; justify-content:center; gap:24px; padding:16px; max-width:1240px; margin:0 auto; }
+    .desktop-left { width:270px; flex-shrink:0; padding-top:4px; }
+    .desktop-feed-col { width:580px; flex-shrink:0; }
+    .desktop-right { width:300px; flex-shrink:0; padding-top:4px; }
+    .sidebar-item { display:flex; align-items:center; gap:12px; padding:8px; border-radius:8px; cursor:pointer; font-size:15px; font-weight:500; color:var(--fb-text); }
+    .sidebar-item:hover { background:var(--fb-input); }
+    .sidebar-item.active { background:#e7f3ff; color:var(--fb-blue); }
+    body.dark .sidebar-item.active { background:#263951; }
+    .sidebar-icon { width:36px; height:36px; border-radius:50%; overflow:hidden; flex-shrink:0; background:var(--fb-input); display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .sidebar-divider { height:1px; background:var(--fb-border); margin:8px 0; }
+    .sidebar-title { font-size:17px; font-weight:700; padding:6px 8px; color:var(--fb-text); }
+    .right-section { margin-bottom:20px; }
+    .right-title { font-size:16px; font-weight:700; margin-bottom:10px; color:var(--fb-text); }
+    .right-ad { background:var(--fb-card); border-radius:10px; border:1px solid var(--fb-border); padding:12px; margin-bottom:8px; cursor:pointer; }
+    .right-ad-img { width:100%; height:110px; border-radius:8px; object-fit:cover; margin-bottom:8px; display:block; }
+    .right-ad-name { font-size:13px; font-weight:700; color:var(--fb-text); }
+    .right-ad-url { font-size:12px; color:var(--fb-muted); }
+    .contact-item { display:flex; align-items:center; gap:10px; padding:6px 0; cursor:pointer; }
+    .contact-avatar { width:36px; height:36px; border-radius:50%; overflow:hidden; position:relative; flex-shrink:0; }
+    .contact-avatar img { width:100%; height:100%; object-fit:cover; }
+    .online-dot { position:absolute; bottom:0; right:0; width:11px; height:11px; background:#31a24c; border-radius:50%; border:2px solid var(--fb-card); }
+    .contact-name { font-size:15px; font-weight:500; color:var(--fb-text); }
+    /* desktop post images taller */
+    #screen-fb-desktop .fb-post-img { height:320px; }
+    #screen-fb-desktop .td-ad-hero { padding:36px 40px; }
+    #screen-fb-desktop .td-ad-headline { font-size:24px; }
+    #screen-fb-desktop .td-ad-subhead { font-size:15px; }
+    #screen-fb-desktop .td-ad-steps { gap:12px; }
+    #screen-fb-desktop .td-ad-step { padding:14px 10px; }
+    #screen-fb-desktop .td-ad-step-icon { font-size:26px; }
+    #screen-fb-desktop .td-ad-step-label { font-size:12px; }
+    #screen-fb-desktop .fb-post-reactions,
+    #screen-fb-desktop .fb-post-body { padding-left:16px; padding-right:16px; }
+
+    /* ============================================================
+       TD EASY SWITCH LANDING PAGE  (shared mobile + desktop)
+    ============================================================ */
+    /* Header */
+    .td-header {
+      background: #fff; border-bottom: 3px solid #00843D;
+      padding: 0 24px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      position: sticky; top: 0; z-index: 50;
+    }
+    body.dark .td-header { background: #1e293b; border-color: var(--td-green); }
+    .td-header-logo { display:flex; align-items:center; gap:10px; }
+    .td-logo-box { width:40px; height:40px; background:var(--td-green); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; font-weight:900; letter-spacing:-1px; }
+    .td-header-brand { font-size:17px; font-weight:700; color:var(--td-text); }
+    .td-header-brand span { color:var(--td-green); }
+    .td-header-nav { display:flex; gap:20px; font-size:14px; }
+    .td-header-nav a { text-decoration:none; color:var(--td-muted); }
+    .td-header-nav a:hover { color:var(--td-green); }
+    .td-header-phone { font-size:14px; font-weight:600; color:var(--td-green); }
+    /* Back button strip */
+    .td-back-bar {
+      background: var(--td-bg); border-bottom: 1px solid var(--td-border);
+      padding: 10px 20px; display:flex; align-items:center; gap:8px;
+    }
+    .td-back-btn { background:none; border:none; color:var(--td-green); font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px; padding:4px 0; }
+    .td-back-btn:hover { text-decoration:underline; }
+    /* Hero banner */
+    .td-landing-hero {
+      background: linear-gradient(135deg, #00A651 0%, #007A3C 60%, #004d26 100%);
+      padding: 40px 24px 36px; text-align:center; position:relative; overflow:hidden;
+    }
+    .td-landing-hero::before { content:''; position:absolute; top:-60px; right:-60px; width:260px; height:260px; background:rgba(255,255,255,.06); border-radius:50%; }
+    .td-landing-hero::after  { content:''; position:absolute; bottom:-80px; left:-40px; width:220px; height:220px; background:rgba(255,255,255,.04); border-radius:50%; }
+    .td-hero-eyebrow { display:inline-block; background:rgba(255,255,255,.2); color:#fff; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:5px 14px; border-radius:20px; margin-bottom:14px; position:relative; z-index:1; }
+    .td-hero-headline { color:#fff; font-size:26px; font-weight:900; line-height:1.2; margin-bottom:10px; position:relative; z-index:1; }
+    .td-hero-sub { color:rgba(255,255,255,.88); font-size:15px; line-height:1.6; max-width:500px; margin:0 auto 20px; position:relative; z-index:1; }
+    .td-hero-steps { display:flex; gap:10px; justify-content:center; max-width:480px; margin:0 auto; position:relative; z-index:1; flex-wrap:wrap; }
+    .td-hero-step { background:rgba(255,255,255,.15); border-radius:12px; padding:12px 14px; text-align:center; min-width:90px; flex:1; }
+    .td-hero-step-icon { font-size:22px; margin-bottom:5px; }
+    .td-hero-step-label { font-size:11px; color:rgba(255,255,255,.92); font-weight:600; line-height:1.4; }
+
+    /* Upload zone area */
+    .td-upload-section {
+      max-width: 680px; margin: 32px auto; padding: 0 20px 40px;
+    }
+    .td-section-title { font-size:18px; font-weight:800; color:var(--td-text); margin-bottom:6px; }
+    .td-section-sub { font-size:14px; color:var(--td-muted); margin-bottom:24px; line-height:1.6; }
+
+    /* Info fields (name + contact) */
+    .td-fields { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+    .td-field { flex:1; min-width:140px; display:flex; flex-direction:column; gap:5px; }
+    .td-field label { font-size:12px; font-weight:700; color:var(--td-muted); text-transform:uppercase; letter-spacing:.5px; }
+    .td-field input {
+      padding:11px 13px; border:1.5px solid var(--td-border);
+      border-radius:10px; font-size:15px; font-family:var(--font);
+      background:var(--td-input); color:var(--td-text);
+      transition:border-color .15s;
+    }
+    .td-field input:focus { outline:none; border-color:var(--td-green); }
+    .pref-row { display:flex; gap:8px; margin-bottom:20px; }
+    .pref-btn {
+      flex:1; padding:11px; border-radius:10px;
+      border:1.5px solid var(--td-border); background:var(--td-card);
+      font-size:14px; font-weight:600; cursor:pointer; color:var(--td-text); transition:all .15s;
+    }
+    .pref-btn.active { border-color:var(--td-green); background:var(--td-green-pale); color:var(--td-green-d); }
+
+    /* THE BIG DROP ZONE */
+    .td-drop-zone {
+      border: 3px dashed var(--td-border);
+      border-radius: 20px;
+      padding: 56px 24px;
+      text-align: center;
+      background: var(--td-card);
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+    }
+    .td-drop-zone.drag-over { border-color:var(--td-green); background:var(--td-green-pale); }
+    .td-drop-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .dz-icon { font-size:56px; margin-bottom:16px; display:block; }
+    .dz-title { font-size:20px; font-weight:800; color:var(--td-text); margin-bottom:8px; }
+    .dz-sub { font-size:15px; color:var(--td-muted); margin-bottom:20px; line-height:1.55; }
+    .dz-or { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+    .dz-or-line { flex:1; height:1px; background:var(--td-border); }
+    .dz-or-text { font-size:13px; color:var(--td-muted); font-weight:600; }
+    .dz-upload-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--td-green); color:#fff; border:none; border-radius:12px;
+      padding:14px 28px; font-size:16px; font-weight:700; cursor:pointer;
+      transition:background .15s; position:relative; z-index:1;
+    }
+    .dz-upload-btn:hover { background:var(--td-green-d); }
+    .dz-types { display:flex; justify-content:center; gap:8px; margin-top:16px; flex-wrap:wrap; }
+    .dz-type { background:var(--fb-input); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; color:var(--td-muted); }
+
+    /* File selected state */
+    .td-file-preview { display:none; align-items:center; gap:12px; padding:16px; background:var(--td-green-pale); border-radius:14px; margin-top:16px; }
+    .td-file-preview.show { display:flex; }
+    .fp-icon { font-size:32px; }
+    .fp-name { font-size:15px; font-weight:700; color:var(--td-text); }
+    .fp-size { font-size:13px; color:var(--td-muted); }
+    .fp-remove { font-size:20px; cursor:pointer; color:var(--td-muted); margin-left:auto; }
+
+    /* Submit button */
+    .td-submit-btn {
+      width:100%; padding:16px; margin-top:20px;
+      background:var(--td-green); color:#fff;
+      border:none; border-radius:14px;
+      font-size:18px; font-weight:900; cursor:pointer;
+      transition:background .15s; letter-spacing:-.2px;
+    }
+    .td-submit-btn:hover { background:var(--td-green-d); }
+    .td-submit-btn:disabled { background:#9ca3af; cursor:not-allowed; }
+    .td-fine-print { font-size:12px; color:var(--td-muted); text-align:center; margin-top:12px; line-height:1.6; }
+
+    /* Trust bar */
+    .td-trust-bar { display:flex; justify-content:center; gap:24px; margin-bottom:28px; flex-wrap:wrap; }
+    .td-trust-item { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--td-muted); font-weight:600; }
+
+    /* ── CONFIRMATION SCREEN ── */
+    .td-confirm-section { max-width:680px; margin:32px auto; padding:0 20px 48px; }
+    .confirm-hero { text-align:center; padding:20px 0 24px; }
+    .confirm-icon { font-size:60px; animation:popIn .4s ease; display:block; }
+    @keyframes popIn { from{transform:scale(0)}to{transform:scale(1)} }
+    .confirm-title { font-size:22px; font-weight:900; color:var(--td-text); margin:8px 0 4px; }
+    .confirm-sub { font-size:15px; color:var(--td-muted); line-height:1.6; }
+    .data-card { background:var(--td-card); border:1.5px solid var(--td-border); border-radius:14px; overflow:hidden; margin-bottom:14px; }
+    .data-card-header { background:var(--td-green); color:#fff; padding:10px 16px; font-size:13px; font-weight:700; }
+    .data-row { display:flex; justify-content:space-between; padding:10px 16px; border-bottom:1px solid var(--td-border); font-size:14px; }
+    .data-row:last-child { border-bottom:none; }
+    .data-key { color:var(--td-muted); }
+    .data-val { font-weight:700; color:var(--td-text); text-align:right; max-width:55%; }
+    .confirm-question { font-size:16px; font-weight:700; color:var(--td-text); text-align:center; margin:20px 0 12px; }
+    .confirm-btns { display:flex; gap:10px; }
+    .btn-no  { flex:1; padding:14px; border:2px solid var(--td-border); background:var(--td-card); border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; color:var(--td-text); }
+    .btn-yes { flex:2; padding:14px; background:var(--td-green); color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:800; cursor:pointer; }
+    .btn-yes:hover { background:var(--td-green-d); }
+
+    /* ── QUOTE SENT SCREEN ── */
+    .td-sent-section { max-width:500px; margin:48px auto; padding:0 20px 60px; text-align:center; }
+    .sent-icon { font-size:80px; animation:ring .6s ease infinite alternate; display:block; margin-bottom:20px; }
+    @keyframes ring { from{transform:rotate(-8deg)}to{transform:rotate(8deg)} }
+    .sent-title { font-size:24px; font-weight:900; color:var(--td-text); margin-bottom:10px; }
+    .sent-sub { font-size:16px; color:var(--td-muted); line-height:1.7; margin-bottom:24px; }
+    .sent-badge { display:inline-flex; align-items:center; gap:8px; background:var(--td-green-pale); color:var(--td-green-d); border-radius:20px; padding:10px 20px; font-size:14px; font-weight:700; }
+
+    /* TD footer */
+    .td-footer { background:#1a1a1a; color:#888; text-align:center; padding:20px; font-size:12px; line-height:1.6; }
+    body.dark .td-footer { background:#0a0f1a; }
+
+    /* mobile: hide desktop-only nav items */
+    #screen-td-mobile .td-header-nav,
+    #screen-td-mobile .td-header-phone { display:none; }
+    #screen-td-mobile .td-trust-bar { gap:12px; }
+    #screen-td-mobile .td-hero-headline { font-size:22px; }
+    #screen-td-mobile .td-upload-section { padding:0 16px 32px; margin-top:20px; }
+    #screen-td-mobile .td-drop-zone { padding:40px 16px; }
+    #screen-td-mobile .dz-icon { font-size:44px; }
+    #screen-td-mobile .dz-title { font-size:17px; }
+    #screen-td-mobile .td-confirm-section { padding:0 16px 32px; margin-top:20px; }
+    #screen-td-mobile .td-sent-section { margin-top:24px; }
+  </style>
+</head>
+<body class="light">
+
+  <!-- ============================================================
+       FLOATING CONTROLS
+  ============================================================ -->
+  <div id="floating-controls">
+    <span class="fc-label" id="fc-view-label">Mobile</span>
+    <label class="fc-toggle" title="Toggle mobile/desktop">
+      <input type="checkbox" id="fc-view-chk" onchange="toggleView(this.checked)" />
+      <div class="fc-track"></div>
+      <div class="fc-knob">🖥️</div>
+    </label>
+    <div class="fc-sep"></div>
+    <span class="fc-label" id="fc-theme-label">Light</span>
+    <label class="fc-toggle" title="Toggle dark mode">
+      <input type="checkbox" id="fc-theme-chk" onchange="toggleTheme(this.checked)" />
+      <div class="fc-track"></div>
+      <div class="fc-knob">🌙</div>
+    </label>
+  </div>
+
+  <!-- ============================================================
+       MOBILE — Phone frame
+  ============================================================ -->
+  <div id="phone-stage">
+    <div id="phone-bezel">
+      <div id="phone-screen">
+        <div id="phone-island"><div class="bar"></div><div class="cam"></div></div>
+        <div id="phone-statusbar">
+          <span class="st-time" id="clock-m">9:41</span>
+          <span class="st-icons">▶ 📶 🔋</span>
+        </div>
+        <div id="phone-view">
+
+          <!-- Mobile: Facebook feed -->
+          <div class="screen active" id="screen-fb-mobile">
+            <!-- content injected by JS -->
+          </div>
+
+          <!-- Mobile: TD landing page -->
+          <div class="screen" id="screen-td-mobile">
+            <div class="td-header">
+              <div class="td-header-logo">
+                <div class="td-logo-box">TD</div>
+                <div class="td-header-brand">TD <span>Insurance</span></div>
+              </div>
+              <div style="font-size:22px;cursor:pointer;" onclick="navTo('mobile','fb')">✕</div>
+            </div>
+            <div id="td-mobile-content"><!-- injected --></div>
+            <div class="td-footer">© TD Insurance · Privacy · Terms · 1-866-361-2311</div>
+          </div>
+
+        </div>
+        <div id="phone-home"><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DESKTOP — Browser chrome
+  ============================================================ -->
+  <div id="desktop-stage">
+    <div class="browser-chrome">
+      <div class="browser-dots">
+        <div class="browser-dot red"></div>
+        <div class="browser-dot yellow"></div>
+        <div class="browser-dot green"></div>
+      </div>
+      <div class="browser-urlbar">
+        <span>🔒</span>
+        <span id="browser-url-text">facebook.com</span>
+      </div>
+    </div>
+    <div id="desktop-view">
+
+      <!-- Desktop: Facebook feed -->
+      <div class="screen active" id="screen-fb-desktop">
+        <div class="desktop-topnav">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="fb-logo-desktop">f</div>
+            <input class="desktop-nav-search" type="text" placeholder="🔍 Search Facebook" />
+          </div>
+          <div class="desktop-nav-center">
+            <div class="desktop-nav-tab active">🏠</div>
+            <div class="desktop-nav-tab">📺</div>
+            <div class="desktop-nav-tab">🛒</div>
+            <div class="desktop-nav-tab">👥</div>
+          </div>
+          <div class="desktop-nav-right">
+            <div class="desktop-nav-btn">⬛</div>
+            <div class="desktop-nav-btn">💬</div>
+            <div class="desktop-nav-btn">🔔</div>
+            <img src="https://i.pravatar.cc/40?img=12" style="width:38px;height:38px;border-radius:50%;cursor:pointer;" alt="avatar"/>
+          </div>
+        </div>
+        <div class="desktop-layout">
+          <div class="desktop-left" id="desktop-left-sidebar"><!-- injected --></div>
+          <div class="desktop-feed-col" id="desktop-feed-col"><!-- injected --></div>
+          <div class="desktop-right" id="desktop-right-sidebar"><!-- injected --></div>
+        </div>
+      </div>
+
+      <!-- Desktop: TD landing page -->
+      <div class="screen" id="screen-td-desktop">
+        <div class="td-header">
+          <div class="td-header-logo">
+            <div class="td-logo-box">TD</div>
+            <div class="td-header-brand">TD <span>Insurance</span></div>
+          </div>
+          <div class="td-header-nav">
+            <a href="#">Auto</a><a href="#">Home</a><a href="#">Life</a><a href="#">Bundles</a>
+          </div>
+          <div class="td-header-phone">📞 1-866-361-2311</div>
+        </div>
+        <div class="td-back-bar">
+          <button class="td-back-btn" onclick="navTo('desktop','fb')">← Back to Facebook</button>
+          <span style="font-size:13px;color:var(--td-muted);">You're now on tdinsurance.com</span>
+        </div>
+        <div id="td-desktop-content"><!-- injected --></div>
+        <div class="td-footer">© TD Insurance · Privacy Policy · Terms of Use · Accessibility · 1-866-361-2311</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  "use strict";
+
+  /* ──────────────────────────────────────────────────────
+     DATA
+  ────────────────────────────────────────────────────── */
+  const POSTS = [
+    { name:"David Leblanc", meta:"2 hrs · 🌐", avatar:"https://i.pravatar.cc/42?img=11",
+      body:"Just got back from the cottage — what an amazing long weekend! The drive up was smooth and the weather was perfect 🌞🍁 Nothing better than Canadian summer.",
+      img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=280&fit=crop",
+      reactions:"👍❤️😆 142", comments:"18 comments · 4 shares" },
+    { name:"Toronto Foodies", meta:"4 hrs · 🌐", avatar:"https://i.pravatar.cc/42?img=25",
+      body:"New ramen spot just opened on Queen West and it's 🔥🍜 The broth is incredible — went twice already this week. DM for the address!",
+      img:"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=600&h=280&fit=crop",
+      reactions:"❤️😋👍 318", comments:"47 comments" },
+    { name:"Canadian Car Enthusiasts", meta:"5 hrs · 🌐", avatar:"https://i.pravatar.cc/42?img=52",
+      body:"2025 model year deals are getting crazy. Anyone else shopping around for auto insurance before year-end? I just found out I was overpaying by $600/year 😤",
+      img:"https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&h=280&fit=crop",
+      reactions:"😤👍 89", comments:"23 comments · 11 shares" },
+  ];
+  const POST_BELOW = { name:"CBC News", meta:"6 hrs · 🌐", avatar:"https://i.pravatar.cc/42?img=59",
+    body:"Ontario auto insurance rates: what's changing in 2025 and how to make sure you're not overpaying →",
+    img:"https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&h=280&fit=crop",
+    reactions:"😮👍 1,203", comments:"445 comments · 288 shares" };
+  const STORIES = [
+    {img:"https://i.pravatar.cc/60?img=47",name:"Sarah M."},
+    {img:"https://i.pravatar.cc/60?img=33",name:"Mike T."},
+    {img:"https://i.pravatar.cc/60?img=5",name:"Jessica"},
+    {img:"https://i.pravatar.cc/60?img=9",name:"Carlos"},
+    {img:"https://i.pravatar.cc/60?img=20",name:"Amanda"},
+  ];
+
+  /* ──────────────────────────────────────────────────────
+     HTML BUILDERS
+  ────────────────────────────────────────────────────── */
+  function stories() {
+    return `<div class="fb-stories">
+      <div class="fb-story"><div class="fb-story-ring no-ring" style="background:var(--fb-input);display:flex;align-items:center;justify-content:center;font-size:22px;border-radius:50%">➕</div><div class="fb-story-name">Your Story</div></div>
+      ${STORIES.map(s=>`<div class="fb-story"><div class="fb-story-ring"><img class="fb-story-img" src="${s.img}" alt="${s.name}" loading="lazy"/></div><div class="fb-story-name">${s.name}</div></div>`).join('')}
+    </div>`;
+  }
+  function composer(avatarSrc) {
+    return `<div class="fb-composer">
+      <div class="fb-composer-row">
+        <div class="fb-composer-avatar"><img src="${avatarSrc}" alt="you" loading="lazy"/></div>
+        <div class="fb-composer-box">What's on your mind?</div>
+      </div>
+      <div class="fb-composer-actions">
+        <span class="fb-composer-action">📹 Live</span>
+        <span class="fb-composer-action">🖼️ Photo</span>
+        <span class="fb-composer-action">😊 Feeling</span>
+      </div>
+    </div>`;
+  }
+  function post(p) {
+    return `<div class="fb-post">
+      <div class="fb-post-header">
+        <div class="fb-post-avatar"><img src="${p.avatar}" alt="${p.name}" loading="lazy"/></div>
+        <div><div class="fb-post-author">${p.name}</div><div class="fb-post-meta">${p.meta}</div></div>
+        <div class="fb-post-more">···</div>
+      </div>
+      <div class="fb-post-body">${p.body}</div>
+      <img class="fb-post-img" src="${p.img}" alt="" loading="lazy"/>
+      <div class="fb-post-reactions"><span>${p.reactions}</span><span>${p.comments}</span></div>
+      <div class="fb-post-actions">
+        <div class="fb-post-action">👍 Like</div>
+        <div class="fb-post-action">💬 Comment</div>
+        <div class="fb-post-action">↗️ Share</div>
+      </div>
+    </div>`;
+  }
+  function adCard(view) {
+    return `<div class="fb-post">
+      <div class="fb-post-header">
+        <div class="fb-post-avatar page-icon" style="background:var(--td-green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900;">TD</div>
+        <div><div class="fb-post-author">TD Insurance</div><div class="fb-post-meta">Sponsored · 🌐</div></div>
+        <div class="fb-post-more">···</div>
+      </div>
+      <div class="td-ad-hero">
+        <div class="td-ad-eyebrow">🍁 Exclusive Easy Switch Offer</div>
+        <div class="td-ad-headline">Switch to TD Insurance in 60 seconds.<br>No forms. Just upload.</div>
+        <div class="td-ad-subhead">Upload your current pink slip or policy document. Our AI reads it instantly and builds your TD quote automatically — no lengthy forms, no hold music.</div>
+        <div class="td-ad-steps">
+          <div class="td-ad-step"><div class="td-ad-step-icon">📄</div><div class="td-ad-step-label">Upload your policy</div></div>
+          <div class="td-ad-step"><div class="td-ad-step-icon">⚡</div><div class="td-ad-step-label">We scan instantly</div></div>
+          <div class="td-ad-step"><div class="td-ad-step-icon">💬</div><div class="td-ad-step-label">Quote in minutes</div></div>
+          <div class="td-ad-step"><div class="td-ad-step-icon">📞</div><div class="td-ad-step-label">Advisor calls you</div></div>
+        </div>
+      </div>
+      <div class="td-ad-cta-strip">
+        <div>
+          <div class="td-ad-cta-url">tdinsurance.com</div>
+          <div class="td-ad-cta-title">TD Easy Switch — Instant Quote</div>
+          <div class="td-ad-cta-desc">Upload your policy. Get a quote. Done.</div>
+        </div>
+        <button class="td-ad-cta-btn" onclick="clickAd('${view}')">Get My Quote →</button>
+      </div>
+      <div class="fb-post-reactions"><span>👍❤️ 2,841</span><span>194 comments · 567 shares</span></div>
+      <div class="fb-post-actions">
+        <div class="fb-post-action">👍 Like</div>
+        <div class="fb-post-action">💬 Comment</div>
+        <div class="fb-post-action">↗️ Share</div>
+      </div>
+    </div>`;
+  }
+
+  /* TD landing page screens — upload, confirm, sent */
+  function tdUploadScreen(viewId) {
+    return `
+    <div class="td-landing-hero">
+      <div class="td-hero-eyebrow">🍁 Easy Switch — Exclusive Offer</div>
+      <div class="td-hero-headline">Your quote is already in your hands.<br>Just upload it.</div>
+      <div class="td-hero-sub">Skip the form. Upload your current policy document or pink slip — we'll read it and build your personalized TD quote in seconds.</div>
+      <div class="td-hero-steps">
+        <div class="td-hero-step"><div class="td-hero-step-icon">📄</div><div class="td-hero-step-label">Upload your<br>current policy</div></div>
+        <div class="td-hero-step"><div class="td-hero-step-icon">🔍</div><div class="td-hero-step-label">We scan it<br>instantly</div></div>
+        <div class="td-hero-step"><div class="td-hero-step-icon">📋</div><div class="td-hero-step-label">Confirm your<br>details</div></div>
+        <div class="td-hero-step"><div class="td-hero-step-icon">📞</div><div class="td-hero-step-label">Advisor<br>calls you</div></div>
+      </div>
+    </div>
+    <div class="td-upload-section">
+      <div class="td-trust-bar">
+        <div class="td-trust-item">🔒 Bank-level security</div>
+        <div class="td-trust-item">🍁 TD Canada Trust</div>
+        <div class="td-trust-item">⚡ 60-second quote</div>
+      </div>
+      <div class="td-section-title">Tell us who you are</div>
+      <div class="td-section-sub">Just your name and how you'd like to be reached — that's it.</div>
+      <div class="td-fields">
+        <div class="td-field"><label>First Name</label><input type="text" id="td-fname-${viewId}" placeholder="e.g. Sarah"/></div>
+        <div class="td-field"><label>Last Name</label><input type="text" id="td-lname-${viewId}" placeholder="e.g. Johnson"/></div>
+      </div>
+      <div class="td-fields" style="margin-bottom:8px;">
+        <div class="td-field" style="flex:0 0 auto;min-width:0;">
+          <label>Preferred Contact</label>
+          <div class="pref-row" style="margin-bottom:0;">
+            <button class="pref-btn active" id="pref-sms-${viewId}" onclick="setPref('${viewId}','sms')">📱 SMS</button>
+            <button class="pref-btn" id="pref-email-${viewId}" onclick="setPref('${viewId}','email')">✉️ Email</button>
+          </div>
+        </div>
+        <div class="td-field"><label>&nbsp;</label><input type="tel" id="td-contact-${viewId}" placeholder="Mobile number"/></div>
+      </div>
+
+      <div style="height:20px;"></div>
+      <div class="td-section-title">Upload your policy document</div>
+      <div class="td-section-sub">Pink slip, full policy PDF, or even a photo of your insurance card — we can read them all.</div>
+
+      <div class="td-drop-zone" id="dz-${viewId}">
+        <input type="file" accept="image/*,.pdf" id="fi-${viewId}" onchange="handleFile('${viewId}',this.files[0])"/>
+        <span class="dz-icon">📄</span>
+        <div class="dz-title">Drag & drop your document here</div>
+        <div class="dz-sub">Pink slip · Policy PDF · Photo of insurance card<br>We accept photos taken on your phone</div>
+        <div class="dz-or"><div class="dz-or-line"></div><div class="dz-or-text">or</div><div class="dz-or-line"></div></div>
+        <button class="dz-upload-btn" onclick="event.stopPropagation();document.getElementById('fi-${viewId}').click()">📂 Browse & Upload</button>
+        <div class="dz-types">
+          <span class="dz-type">JPG</span><span class="dz-type">PNG</span>
+          <span class="dz-type">HEIC</span><span class="dz-type">PDF</span>
+        </div>
+      </div>
+      <div class="td-file-preview" id="fp-${viewId}">
+        <span class="fp-icon" id="fp-icon-${viewId}">📄</span>
+        <div><div class="fp-name" id="fp-name-${viewId}">—</div><div class="fp-size" id="fp-size-${viewId}">—</div></div>
+        <span class="fp-remove" onclick="removeFile('${viewId}')">✕</span>
+      </div>
+      <button class="td-submit-btn" id="sub-${viewId}" onclick="submitForm('${viewId}')" disabled>🔍 Scan My Policy & Get a Quote</button>
+      <div class="td-fine-print">By submitting you agree to be contacted by a TD Insurance advisor. Your document is securely processed and not stored long-term.</div>
+    </div>`;
+  }
+
+  function tdConfirmScreen(viewId, fname, lname) {
+    return `
+    <div class="td-confirm-section">
+      <div class="confirm-hero">
+        <span class="confirm-icon">✅</span>
+        <div class="confirm-title">Policy Scanned Successfully!</div>
+        <div class="confirm-sub">Here's what we found. Please confirm the details are correct before we generate your TD quote.</div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-header">👤 Personal Information</div>
+        <div class="data-row"><span class="data-key">Name</span><span class="data-val">${fname} ${lname}</span></div>
+        <div class="data-row"><span class="data-key">Address</span><span class="data-val">42 Maple Ave, Toronto ON</span></div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-header">🚗 Vehicle</div>
+        <div class="data-row"><span class="data-key">Vehicle</span><span class="data-val">2021 Honda Civic LX</span></div>
+        <div class="data-row"><span class="data-key">VIN</span><span class="data-val">2HGFE2F59MH502841</span></div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-header">🛡️ Current Coverage</div>
+        <div class="data-row"><span class="data-key">Insurer</span><span class="data-val">Aviva Canada</span></div>
+        <div class="data-row"><span class="data-key">Coverage</span><span class="data-val">Comprehensive + Collision</span></div>
+        <div class="data-row"><span class="data-key">Liability</span><span class="data-val">$2,000,000</span></div>
+        <div class="data-row"><span class="data-key">Deductible</span><span class="data-val">$500 / $1,000</span></div>
+        <div class="data-row"><span class="data-key">Policy Expires</span><span class="data-val">March 15, 2026</span></div>
+      </div>
+      <div class="confirm-question">Would you like a TD quote based on this information?</div>
+      <div class="confirm-btns">
+        <button class="btn-no" onclick="navTo('${viewId}','td')">No thanks</button>
+        <button class="btn-yes" onclick="showSent('${viewId}')">✅ Yes, get my TD quote</button>
+      </div>
+    </div>`;
+  }
+
+  function tdSentScreen() {
+    return `
+    <div class="td-sent-section">
+      <span class="sent-icon">📞</span>
+      <div class="sent-title">Your quote is ready!</div>
+      <div class="sent-sub">A TD Insurance advisor will be calling you shortly to walk you through your personalized quote. This usually takes less than 5 minutes.</div>
+      <div class="sent-badge">
+        <span style="background:var(--td-green);color:#fff;border-radius:6px;padding:2px 12px;font-size:12px;font-weight:900;">TD</span>
+        Secure · No obligation · ~5 min call
+      </div>
+    </div>`;
+  }
+
+  /* ──────────────────────────────────────────────────────
+     INIT FEEDS
+  ────────────────────────────────────────────────────── */
+  function buildMobileFeed() {
+    return `
+      <div style="background:var(--fb-blue);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;position:sticky;top:0;z-index:50;">
+        <div class="fb-logo">f</div>
+        <input class="fb-nav-search-m" type="text" placeholder="🔍 Search"/>
+        <div class="fb-nav-icons">
+          <div class="fb-nav-icon">💬</div>
+          <div class="fb-nav-icon">🔔</div>
+        </div>
+      </div>
+      ${stories()}
+      ${composer("https://i.pravatar.cc/38?img=12")}
+      ${POSTS.map(post).join('')}
+      ${adCard('mobile')}
+      ${post(POST_BELOW)}
+    `;
+  }
+
+  function buildDesktopFeed() {
+    // Left sidebar
+    document.getElementById('desktop-left-sidebar').innerHTML = `
+      <div class="sidebar-item active"><div class="sidebar-icon"><img src="https://i.pravatar.cc/36?img=12" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/></div>John Pierce</div>
+      <div class="sidebar-item"><div class="sidebar-icon">👥</div>Friends</div>
+      <div class="sidebar-item"><div class="sidebar-icon">🕐</div>Memories</div>
+      <div class="sidebar-item"><div class="sidebar-icon">🔖</div>Saved</div>
+      <div class="sidebar-item"><div class="sidebar-icon">👥</div>Groups</div>
+      <div class="sidebar-item"><div class="sidebar-icon">🛒</div>Marketplace</div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-title">Shortcuts</div>
+      <div class="sidebar-item"><div class="sidebar-icon">🍁</div>Canada News</div>
+      <div class="sidebar-item"><div class="sidebar-icon">🚗</div>Car Enthusiasts</div>
+    `;
+    // Feed
+    document.getElementById('desktop-feed-col').innerHTML =
+      stories() + composer("https://i.pravatar.cc/38?img=12") +
+      POSTS.map(post).join('') + adCard('desktop') + post(POST_BELOW);
+    // Right sidebar
+    document.getElementById('desktop-right-sidebar').innerHTML = `
+      <div class="right-section">
+        <div class="right-title">Sponsored</div>
+        <div class="right-ad"><img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=300&h=110&fit=crop" class="right-ad-img" alt="RBC"/><div class="right-ad-name">RBC Home Insurance</div><div class="right-ad-url">rbcinsurance.com</div></div>
+        <div class="right-ad"><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=300&h=110&fit=crop" class="right-ad-img" alt="CAA"/><div class="right-ad-name">CAA Auto Insurance</div><div class="right-ad-url">caa.ca</div></div>
+      </div>
+      <div class="right-section">
+        <div class="right-title">Contacts</div>
+        <div class="contact-item"><div class="contact-avatar"><img src="https://i.pravatar.cc/36?img=47" alt="Sarah"/><div class="online-dot"></div></div><span class="contact-name">Sarah Mitchell</span></div>
+        <div class="contact-item"><div class="contact-avatar"><img src="https://i.pravatar.cc/36?img=33" alt="Mike"/><div class="online-dot"></div></div><span class="contact-name">Mike Torres</span></div>
+        <div class="contact-item"><div class="contact-avatar"><img src="https://i.pravatar.cc/36?img=5" alt="Jessica"/></div><span class="contact-name">Jessica Kowalski</span></div>
+        <div class="contact-item"><div class="contact-avatar"><img src="https://i.pravatar.cc/36?img=9" alt="Carlos"/></div><span class="contact-name">Carlos Reyes</span></div>
+      </div>
+    `;
+  }
+
+  /* ──────────────────────────────────────────────────────
+     NAVIGATION
+  ────────────────────────────────────────────────────── */
+
+  // Desktop: open TD landing in a new tab. Mobile: navigate inside phone frame.
+  function clickAd(view) {
+    if (view === 'desktop') {
+      window.open('td-landing.html', '_blank');
+    } else {
+      navTo('mobile', 'td');
+    }
+  }
+
+  function navTo(view, dest) {
+    if (view === 'mobile') {
+      const fb  = document.getElementById('screen-fb-mobile');
+      const td  = document.getElementById('screen-td-mobile');
+      const bar = document.getElementById('phone-statusbar');
+      if (dest === 'td') {
+        fb.classList.remove('active');
+        td.classList.add('active');
+        bar.classList.add('td-bar');
+        document.getElementById('td-mobile-content').innerHTML = tdUploadScreen('mobile');
+        wireDropZone('mobile');
+        // Scroll the screen div to top AFTER it is visible
+        requestAnimationFrame(() => { td.scrollTop = 0; });
+      } else {
+        td.classList.remove('active');
+        fb.classList.add('active');
+        bar.classList.remove('td-bar');
+      }
+    } else {
+      const fb      = document.getElementById('screen-fb-desktop');
+      const td      = document.getElementById('screen-td-desktop');
+      const urlText = document.getElementById('browser-url-text');
+      if (dest === 'td') {
+        fb.classList.remove('active');
+        td.classList.add('active');
+        urlText.textContent = 'tdinsurance.com/easy-switch';
+        document.getElementById('td-desktop-content').innerHTML = tdUploadScreen('desktop');
+        wireDropZone('desktop');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        document.getElementById('desktop-stage').scrollTop = 0;
+      } else {
+        td.classList.remove('active');
+        fb.classList.add('active');
+        urlText.textContent = 'facebook.com';
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    }
+  }
+
+  /* ──────────────────────────────────────────────────────
+     UPLOAD LOGIC
+  ────────────────────────────────────────────────────── */
+  function wireDropZone(vid) {
+    const dz = document.getElementById('dz-' + vid);
+    if (!dz) return;
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) handleFile(vid, e.dataTransfer.files[0]);
+    });
+  }
+  function handleFile(vid, file) {
+    if (!file) return;
+    const icons = {'application/pdf':'📋','image/jpeg':'🖼️','image/png':'🖼️','image/heic':'🖼️'};
+    document.getElementById('fp-icon-'+vid).textContent = icons[file.type] || '📄';
+    document.getElementById('fp-name-'+vid).textContent = file.name;
+    document.getElementById('fp-size-'+vid).textContent = (file.size/1024/1024).toFixed(1)+' MB · Ready to scan';
+    document.getElementById('fp-'+vid).classList.add('show');
+    document.getElementById('sub-'+vid).disabled = false;
+  }
+  function removeFile(vid) {
+    document.getElementById('fp-'+vid).classList.remove('show');
+    document.getElementById('sub-'+vid).disabled = true;
+    const fi = document.getElementById('fi-'+vid);
+    if (fi) fi.value = '';
+  }
+  function setPref(vid, p) {
+    document.getElementById('pref-sms-'+vid).classList.toggle('active', p==='sms');
+    document.getElementById('pref-email-'+vid).classList.toggle('active', p==='email');
+    const inp = document.getElementById('td-contact-'+vid);
+    if (p==='sms') { inp.type='tel'; inp.placeholder='Mobile number'; }
+    else { inp.type='email'; inp.placeholder='Email address'; }
+  }
+  function submitForm(vid) {
+    const fname = (document.getElementById('td-fname-'+vid).value.trim()) || 'John';
+    const lname = (document.getElementById('td-lname-'+vid).value.trim()) || 'Smith';
+    const btn = document.getElementById('sub-'+vid);
+    btn.textContent = '⏳ Scanning document...'; btn.disabled = true;
+    setTimeout(() => {
+      const container = vid === 'mobile'
+        ? document.getElementById('td-mobile-content')
+        : document.getElementById('td-desktop-content');
+      container.innerHTML = tdConfirmScreen(vid, fname, lname);
+      requestAnimationFrame(() => {
+        if (vid === 'mobile') document.getElementById('screen-td-mobile').scrollTop = 0;
+        else { window.scrollTo({ top: 0, behavior: 'instant' }); }
+      });
+    }, 2200);
+  }
+  function showSent(vid) {
+    const container = vid === 'mobile'
+      ? document.getElementById('td-mobile-content')
+      : document.getElementById('td-desktop-content');
+    container.innerHTML = tdSentScreen();
+    requestAnimationFrame(() => {
+      if (vid === 'mobile') document.getElementById('screen-td-mobile').scrollTop = 0;
+      else { window.scrollTo({ top: 0, behavior: 'instant' }); }
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────
+     VIEW / THEME TOGGLES
+  ────────────────────────────────────────────────────── */
+  function toggleView(isDesktop) {
+    document.getElementById('fc-view-label').textContent = isDesktop ? 'Desktop' : 'Mobile';
+    if (isDesktop) {
+      document.getElementById('phone-stage').style.display   = 'none';
+      document.getElementById('desktop-stage').style.display = 'flex';
+      document.body.classList.add('desktop-mode');
+      document.body.style.overflow = 'auto';
+    } else {
+      document.getElementById('phone-stage').style.display   = 'flex';
+      document.getElementById('desktop-stage').style.display = 'none';
+      document.body.classList.remove('desktop-mode');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+  function toggleTheme(isDark) {
+    document.getElementById('fc-theme-label').textContent = isDark ? 'Dark' : 'Light';
+    document.body.classList.toggle('dark', isDark);
+    document.body.classList.toggle('light', !isDark);
+  }
+
+  /* ──────────────────────────────────────────────────────
+     CLOCK
+  ────────────────────────────────────────────────────── */
+  function tick() {
+    const n = new Date();
+    const t = n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
+    const el = document.getElementById('clock-m');
+    if (el) el.textContent = t;
+  }
+  setInterval(tick, 10000); tick();
+
+  /* ──────────────────────────────────────────────────────
+     BOOT
+  ────────────────────────────────────────────────────── */
+  document.getElementById('screen-fb-mobile').innerHTML = buildMobileFeed();
+  buildDesktopFeed();
+
+  </script>
+</body>
+</html>

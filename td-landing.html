@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TD Easy Switch — Get an Instant Quote</title>
+  <style>
+    :root {
+      --td-green:      #00A651;
+      --td-green-d:    #007A3C;
+      --td-green-pale: #e8f7ef;
+      --td-green-mid:  #d1f0e0;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
+
+    /* ── HEADER ── */
+    .td-header {
+      background: #fff; border-bottom: 3px solid var(--td-green);
+      padding: 0 32px; height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .td-header-logo { display: flex; align-items: center; gap: 12px; }
+    .td-logo-box { width: 44px; height: 44px; background: var(--td-green); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 17px; font-weight: 900; letter-spacing: -1px; }
+    .td-header-brand { font-size: 18px; font-weight: 700; color: #1a1a1a; }
+    .td-header-brand span { color: var(--td-green); }
+    .td-header-nav { display: flex; gap: 28px; font-size: 14px; }
+    .td-header-nav a { text-decoration: none; color: #555; }
+    .td-header-nav a:hover { color: var(--td-green); }
+    .td-header-phone { font-size: 14px; font-weight: 700; color: var(--td-green); }
+
+    /* ── BREADCRUMB ── */
+    .td-crumb {
+      background: #fff; border-bottom: 1px solid #e0e0e0;
+      padding: 10px 32px; font-size: 13px; color: #888;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .td-crumb a { color: var(--td-green); text-decoration: none; font-weight: 600; }
+    .td-crumb a:hover { text-decoration: underline; }
+
+    /* ── HERO ── */
+    .td-hero {
+      background: linear-gradient(135deg, #00A651 0%, #007A3C 55%, #004d26 100%);
+      padding: 56px 32px 48px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .td-hero::before { content:''; position:absolute; top:-80px; right:-80px; width:320px; height:320px; background:rgba(255,255,255,.06); border-radius:50%; }
+    .td-hero::after  { content:''; position:absolute; bottom:-100px; left:-60px; width:280px; height:280px; background:rgba(255,255,255,.04); border-radius:50%; }
+    .td-hero-eyebrow { display:inline-block; background:rgba(255,255,255,.2); color:#fff; font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:5px 14px; border-radius:20px; margin-bottom:16px; position:relative; z-index:1; }
+    .td-hero-headline { color:#fff; font-size:36px; font-weight:900; line-height:1.15; margin-bottom:12px; position:relative; z-index:1; }
+    .td-hero-sub { color:rgba(255,255,255,.88); font-size:17px; line-height:1.65; max-width:580px; margin:0 auto 28px; position:relative; z-index:1; }
+    .td-hero-steps { display:flex; gap:12px; justify-content:center; max-width:560px; margin:0 auto; position:relative; z-index:1; flex-wrap:wrap; }
+    .td-hero-step { background:rgba(255,255,255,.15); border-radius:14px; padding:16px 18px; text-align:center; min-width:110px; flex:1; }
+    .td-hero-step-icon { font-size:26px; margin-bottom:6px; }
+    .td-hero-step-label { font-size:12px; color:rgba(255,255,255,.92); font-weight:600; line-height:1.4; }
+
+    /* ── MAIN CONTENT ── */
+    .td-main { max-width: 800px; margin: 0 auto; padding: 40px 24px 64px; }
+
+    /* Trust bar */
+    .td-trust-bar { display:flex; justify-content:center; gap:32px; margin-bottom:36px; flex-wrap:wrap; }
+    .td-trust-item { display:flex; align-items:center; gap:8px; font-size:14px; color:#666; font-weight:600; }
+
+    /* Section titles */
+    .td-section-title { font-size:20px; font-weight:800; color:#1a1a1a; margin-bottom:6px; }
+    .td-section-sub { font-size:15px; color:#666; margin-bottom:24px; line-height:1.6; }
+
+    /* Fields */
+    .td-fields { display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
+    .td-field { flex:1; min-width:160px; display:flex; flex-direction:column; gap:5px; }
+    .td-field label { font-size:12px; font-weight:700; color:#666; text-transform:uppercase; letter-spacing:.5px; }
+    .td-field input {
+      padding:12px 14px; border:1.5px solid #d1d5db;
+      border-radius:10px; font-size:15px; font-family:var(--font);
+      background:#fafafa; color:#1a1a1a; transition:border-color .15s;
+    }
+    .td-field input:focus { outline:none; border-color:var(--td-green); background:#fff; }
+
+    /* Contact pref */
+    .pref-row { display:flex; gap:10px; margin-bottom:24px; }
+    .pref-btn { flex:1; padding:12px; border-radius:10px; border:1.5px solid #d1d5db; background:#fff; font-size:15px; font-weight:600; cursor:pointer; color:#1a1a1a; transition:all .15s; }
+    .pref-btn.active { border-color:var(--td-green); background:var(--td-green-pale); color:var(--td-green-d); }
+
+    /* ── BIG DROP ZONE ── */
+    .td-drop-zone {
+      border: 3px dashed #d1d5db;
+      border-radius: 24px;
+      padding: 72px 32px;
+      text-align: center;
+      background: #fff;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+      box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+    .td-drop-zone:hover  { border-color: var(--td-green); background: var(--td-green-pale); }
+    .td-drop-zone.drag-over { border-color: var(--td-green); background: var(--td-green-pale); box-shadow: 0 0 0 4px rgba(0,166,81,.12); }
+    .td-drop-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .dz-icon { font-size:64px; margin-bottom:18px; display:block; }
+    .dz-title { font-size:24px; font-weight:900; color:#1a1a1a; margin-bottom:10px; }
+    .dz-sub { font-size:16px; color:#666; margin-bottom:24px; line-height:1.6; }
+    .dz-or { display:flex; align-items:center; gap:16px; margin-bottom:24px; max-width:320px; margin-left:auto; margin-right:auto; }
+    .dz-or-line { flex:1; height:1px; background:#e0e0e0; }
+    .dz-or-text { font-size:13px; color:#999; font-weight:600; }
+    .dz-upload-btn {
+      display:inline-flex; align-items:center; gap:10px;
+      background:var(--td-green); color:#fff; border:none; border-radius:14px;
+      padding:16px 36px; font-size:18px; font-weight:800; cursor:pointer;
+      transition:background .15s; position:relative; z-index:1;
+      box-shadow: 0 4px 14px rgba(0,166,81,.35);
+    }
+    .dz-upload-btn:hover { background:var(--td-green-d); }
+    .dz-types { display:flex; justify-content:center; gap:8px; margin-top:20px; flex-wrap:wrap; }
+    .dz-type { background:#f0f2f5; padding:4px 14px; border-radius:20px; font-size:13px; font-weight:600; color:#666; }
+
+    /* File selected */
+    .td-file-preview { display:none; align-items:center; gap:14px; padding:18px 20px; background:var(--td-green-pale); border-radius:16px; margin-top:16px; border:1.5px solid var(--td-green-mid); }
+    .td-file-preview.show { display:flex; }
+    .fp-icon { font-size:36px; }
+    .fp-name { font-size:16px; font-weight:700; color:#1a1a1a; }
+    .fp-size { font-size:13px; color:#666; margin-top:2px; }
+    .fp-remove { font-size:22px; cursor:pointer; color:#999; margin-left:auto; }
+    .fp-remove:hover { color:#1a1a1a; }
+
+    /* Submit */
+    .td-submit-btn {
+      width:100%; padding:18px; margin-top:24px;
+      background:var(--td-green); color:#fff;
+      border:none; border-radius:14px;
+      font-size:19px; font-weight:900; cursor:pointer;
+      transition:background .15s;
+      box-shadow: 0 4px 16px rgba(0,166,81,.3);
+    }
+    .td-submit-btn:hover { background:var(--td-green-d); }
+    .td-submit-btn:disabled { background:#9ca3af; cursor:not-allowed; box-shadow:none; }
+    .td-fine-print { font-size:12px; color:#999; text-align:center; margin-top:14px; line-height:1.7; }
+
+    /* ── CONFIRMATION SCREEN ── */
+    .td-screen { display:none; }
+    .td-screen.active { display:block; }
+    .confirm-hero { text-align:center; padding:32px 0 24px; }
+    .confirm-icon { font-size:68px; animation:popIn .4s ease; display:block; }
+    @keyframes popIn { from{transform:scale(0)}to{transform:scale(1)} }
+    .confirm-title { font-size:26px; font-weight:900; color:#1a1a1a; margin:10px 0 6px; }
+    .confirm-sub { font-size:16px; color:#666; line-height:1.65; max-width:520px; margin:0 auto; }
+
+    .data-card { background:#fff; border:1.5px solid #e0e0e0; border-radius:14px; overflow:hidden; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,.05); }
+    .data-card-header { background:var(--td-green); color:#fff; padding:12px 18px; font-size:14px; font-weight:700; }
+    .data-row { display:flex; justify-content:space-between; padding:12px 18px; border-bottom:1px solid #f0f0f0; font-size:15px; }
+    .data-row:last-child { border-bottom:none; }
+    .data-key { color:#666; }
+    .data-val { font-weight:700; color:#1a1a1a; text-align:right; }
+
+    .confirm-question { font-size:18px; font-weight:700; color:#1a1a1a; text-align:center; margin:28px 0 14px; }
+    .confirm-btns { display:flex; gap:12px; }
+    .btn-no  { flex:1; padding:15px; border:2px solid #e0e0e0; background:#fff; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; color:#1a1a1a; transition:background .15s; }
+    .btn-no:hover { background:#f5f5f5; }
+    .btn-yes { flex:2; padding:15px; background:var(--td-green); color:#fff; border:none; border-radius:12px; font-size:17px; font-weight:800; cursor:pointer; transition:background .15s; box-shadow:0 4px 14px rgba(0,166,81,.3); }
+    .btn-yes:hover { background:var(--td-green-d); }
+
+    /* ── SENT SCREEN ── */
+    .td-sent { text-align:center; padding:56px 20px 72px; }
+    .sent-icon { font-size:90px; animation:ring .6s ease infinite alternate; display:block; margin-bottom:20px; }
+    @keyframes ring { from{transform:rotate(-8deg)}to{transform:rotate(8deg)} }
+    .sent-title { font-size:28px; font-weight:900; color:#1a1a1a; margin-bottom:12px; }
+    .sent-sub { font-size:17px; color:#666; line-height:1.75; max-width:480px; margin:0 auto 28px; }
+    .sent-badge { display:inline-flex; align-items:center; gap:10px; background:var(--td-green-pale); color:var(--td-green-d); border-radius:24px; padding:12px 24px; font-size:15px; font-weight:700; }
+
+    /* ── FOOTER ── */
+    .td-footer { background:#1a1a1a; color:#888; text-align:center; padding:24px; font-size:13px; line-height:1.7; }
+    .td-footer a { color:#aaa; text-decoration:underline; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="td-header">
+    <div class="td-header-logo">
+      <div class="td-logo-box">TD</div>
+      <div class="td-header-brand">TD <span>Insurance</span></div>
+    </div>
+    <div class="td-header-nav">
+      <a href="#">Auto</a>
+      <a href="#">Home</a>
+      <a href="#">Life</a>
+      <a href="#">Bundles</a>
+      <a href="#">Claims</a>
+    </div>
+    <div class="td-header-phone">📞 1-866-361-2311</div>
+  </div>
+
+  <!-- BREADCRUMB -->
+  <div class="td-crumb">
+    <a href="javascript:window.close()">← Back to Facebook</a>
+    <span>›</span>
+    <span>Easy Switch</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="td-hero">
+    <div class="td-hero-eyebrow">🍁 TD Easy Switch — Exclusive Offer</div>
+    <div class="td-hero-headline">Your quote is already<br>in your hands. Just upload it.</div>
+    <div class="td-hero-sub">Skip the long form. Upload your current pink slip or policy document — our AI reads it instantly and builds your personalized TD quote in seconds.</div>
+    <div class="td-hero-steps">
+      <div class="td-hero-step"><div class="td-hero-step-icon">📄</div><div class="td-hero-step-label">Upload your<br>current policy</div></div>
+      <div class="td-hero-step"><div class="td-hero-step-icon">🔍</div><div class="td-hero-step-label">We scan it<br>instantly</div></div>
+      <div class="td-hero-step"><div class="td-hero-step-icon">📋</div><div class="td-hero-step-label">Confirm your<br>details</div></div>
+      <div class="td-hero-step"><div class="td-hero-step-icon">📞</div><div class="td-hero-step-label">Advisor<br>calls you</div></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="td-main">
+
+    <!-- SCREEN 1: Upload form -->
+    <div class="td-screen active" id="screen-upload">
+      <div class="td-trust-bar">
+        <div class="td-trust-item">🔒 Bank-level security</div>
+        <div class="td-trust-item">🍁 Backed by TD Canada Trust</div>
+        <div class="td-trust-item">⚡ 60-second quote</div>
+        <div class="td-trust-item">🚫 No obligation</div>
+      </div>
+
+      <div class="td-section-title">Tell us who you are</div>
+      <div class="td-section-sub">Just your name and how you'd like us to reach you. That's all we need upfront.</div>
+      <div class="td-fields">
+        <div class="td-field"><label>First Name</label><input type="text" id="fname" placeholder="e.g. Sarah"/></div>
+        <div class="td-field"><label>Last Name</label><input type="text" id="lname" placeholder="e.g. Johnson"/></div>
+      </div>
+      <div class="td-fields" style="align-items:flex-end;">
+        <div class="td-field" style="flex:0 0 220px;">
+          <label>Preferred Contact</label>
+          <div class="pref-row" style="margin-bottom:0;">
+            <button class="pref-btn active" id="pref-sms" onclick="setPref('sms')">📱 SMS</button>
+            <button class="pref-btn" id="pref-email" onclick="setPref('email')">✉️ Email</button>
+          </div>
+        </div>
+        <div class="td-field"><label>Contact Details</label><input type="tel" id="contact-val" placeholder="Mobile number"/></div>
+      </div>
+
+      <div style="height:12px;"></div>
+      <div class="td-section-title">Upload your policy document</div>
+      <div class="td-section-sub">Pink slip, full policy PDF, or a photo of your insurance card — we can read them all. Works with Aviva, Intact, Desjardins, Belairdirect, and more.</div>
+
+      <div class="td-drop-zone" id="drop-zone">
+        <input type="file" accept="image/*,.pdf" id="file-input" onchange="handleFile(this.files[0])"/>
+        <span class="dz-icon">📄</span>
+        <div class="dz-title">Drag & drop your document here</div>
+        <div class="dz-sub">Pink slip · Policy PDF · Photo of your insurance card<br>We accept photos taken on your phone</div>
+        <div class="dz-or">
+          <div class="dz-or-line"></div>
+          <div class="dz-or-text">or</div>
+          <div class="dz-or-line"></div>
+        </div>
+        <button class="dz-upload-btn" onclick="event.stopPropagation();document.getElementById('file-input').click()">
+          📂 Browse & Upload
+        </button>
+        <div class="dz-types">
+          <span class="dz-type">JPG</span>
+          <span class="dz-type">PNG</span>
+          <span class="dz-type">HEIC</span>
+          <span class="dz-type">PDF</span>
+        </div>
+      </div>
+
+      <div class="td-file-preview" id="file-preview">
+        <span class="fp-icon" id="fp-icon">📄</span>
+        <div>
+          <div class="fp-name" id="fp-name">—</div>
+          <div class="fp-size" id="fp-size">—</div>
+        </div>
+        <span class="fp-remove" onclick="removeFile()">✕</span>
+      </div>
+
+      <button class="td-submit-btn" id="submit-btn" onclick="submitForm()" disabled>
+        🔍 Scan My Policy & Get a Quote
+      </button>
+      <div class="td-fine-print">
+        By submitting you agree to be contacted by a TD Insurance advisor. Your document is securely processed and is not stored long-term. TD Insurance is a trade name of TD Home and Auto Insurance Company.
+      </div>
+    </div>
+
+    <!-- SCREEN 2: Confirmation -->
+    <div class="td-screen" id="screen-confirm">
+      <div class="confirm-hero">
+        <span class="confirm-icon">✅</span>
+        <div class="confirm-title">Policy Scanned Successfully!</div>
+        <div class="confirm-sub">Here's what we found in your document. Please confirm the details are correct before we generate your personalized TD quote.</div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-header">👤 Personal Information</div>
+        <div class="data-row"><span class="data-key">Name</span><span class="data-val" id="ex-name">—</span></div>
+        <div class="data-row"><span class="data-key">Address</span><span class="data-val">42 Maple Ave, Toronto ON M4K 1A1</span></div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-header">🚗 Vehicle Information</div>
+        <div class="data-row"><span class="data-key">Vehicle</span><span class="data-val">2021 Honda Civic LX</span></div>
+        <div class="data-row"><span class="data-key">VIN</span><span class="data-val">2HGFE2F59MH502841</span></div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-header">🛡️ Current Coverage</div>
+        <div class="data-row"><span class="data-key">Insurer</span><span class="data-val">Aviva Canada</span></div>
+        <div class="data-row"><span class="data-key">Coverage Type</span><span class="data-val">Comprehensive + Collision</span></div>
+        <div class="data-row"><span class="data-key">Liability</span><span class="data-val">$2,000,000</span></div>
+        <div class="data-row"><span class="data-key">Deductible</span><span class="data-val">$500 / $1,000</span></div>
+        <div class="data-row"><span class="data-key">Policy Expires</span><span class="data-val">March 15, 2026</span></div>
+      </div>
+      <div class="confirm-question">Would you like a TD quote based on this information?</div>
+      <div class="confirm-btns">
+        <button class="btn-no" onclick="showScreen('screen-upload')">No thanks</button>
+        <button class="btn-yes" onclick="showScreen('screen-sent')">✅ Yes, get my TD quote</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: Sent -->
+    <div class="td-screen" id="screen-sent">
+      <div class="td-sent">
+        <span class="sent-icon">📞</span>
+        <div class="sent-title">Your quote is ready!</div>
+        <div class="sent-sub">A TD Insurance advisor will be calling you shortly to walk through your personalized quote. This typically takes less than 5 minutes.</div>
+        <div class="sent-badge">
+          <span style="background:var(--td-green);color:#fff;border-radius:8px;padding:3px 14px;font-size:13px;font-weight:900;">TD</span>
+          Secure · No obligation · ~5 min call
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /td-main -->
+
+  <div class="td-footer">
+    © TD Insurance · <a href="#">Privacy Policy</a> · <a href="#">Terms of Use</a> · <a href="#">Accessibility</a> · 1-866-361-2311<br>
+    TD Insurance is a trade name of TD Home and Auto Insurance Company.
+  </div>
+
+  <script>
+  "use strict";
+
+  function showScreen(id) {
+    document.querySelectorAll('.td-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setPref(p) {
+    document.getElementById('pref-sms').classList.toggle('active', p === 'sms');
+    document.getElementById('pref-email').classList.toggle('active', p === 'email');
+    const inp = document.getElementById('contact-val');
+    if (p === 'sms') { inp.type = 'tel'; inp.placeholder = 'Mobile number'; }
+    else             { inp.type = 'email'; inp.placeholder = 'Email address'; }
+  }
+
+  function handleFile(file) {
+    if (!file) return;
+    const icons = { 'application/pdf':'📋', 'image/jpeg':'🖼️', 'image/png':'🖼️', 'image/heic':'🖼️' };
+    document.getElementById('fp-icon').textContent = icons[file.type] || '📄';
+    document.getElementById('fp-name').textContent = file.name;
+    document.getElementById('fp-size').textContent = (file.size/1024/1024).toFixed(1) + ' MB · Ready to scan';
+    document.getElementById('file-preview').classList.add('show');
+    document.getElementById('submit-btn').disabled = false;
+  }
+
+  function removeFile() {
+    document.getElementById('file-preview').classList.remove('show');
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('file-input').value = '';
+  }
+
+  function submitForm() {
+    const fname = document.getElementById('fname').value.trim() || 'John';
+    const lname = document.getElementById('lname').value.trim() || 'Smith';
+    const btn   = document.getElementById('submit-btn');
+    btn.textContent = '⏳ Scanning document...';
+    btn.disabled = true;
+    setTimeout(() => {
+      document.getElementById('ex-name').textContent = fname + ' ' + lname;
+      showScreen('screen-confirm');
+    }, 2200);
+  }
+
+  // Drag & drop
+  const dz = document.getElementById('drop-zone');
+  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  </script>
+</body>
+</html>

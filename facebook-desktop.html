@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facebook — Desktop</title>
+  <style>
+    :root {
+      --fb-bg: #f0f2f5;
+      --fb-card: #ffffff;
+      --fb-border: #dddfe2;
+      --fb-text: #1c1e21;
+      --fb-muted: #65676b;
+      --fb-blue: #1877f2;
+      --fb-blue-d: #1558b0;
+      --fb-sidebar-w: 280px;
+      --fb-feed-w: 590px;
+      --fb-right-w: 310px;
+      --td-green: #00A651;
+      --td-green-d: #007A3C;
+      --td-green-pale: #e8f7ef;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--fb-bg); color: var(--fb-text); min-height: 100vh; }
+
+    /* ── TOPNAV ── */
+    .fb-topnav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 56px; background: #fff;
+      border-bottom: 1px solid var(--fb-border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.08);
+    }
+    .nav-left { display: flex; align-items: center; gap: 8px; }
+    .fb-logo { font-size: 36px; font-weight: 900; color: var(--fb-blue); line-height: 1; margin-right: 4px; }
+    .nav-search {
+      background: #f0f2f5; border: none; border-radius: 20px;
+      padding: 8px 16px; font-size: 15px; width: 240px; color: var(--fb-text);
+    }
+    .nav-center { display: flex; gap: 4px; }
+    .nav-tab {
+      padding: 0 28px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; cursor: pointer;
+      font-size: 22px; color: var(--fb-muted);
+      border-bottom: 3px solid transparent; transition: all .1s;
+    }
+    .nav-tab.active { color: var(--fb-blue); border-bottom-color: var(--fb-blue); }
+    .nav-tab:hover { background: #f0f2f5; }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #e4e6eb; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 18px;
+    }
+    .nav-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--fb-blue); display: flex; align-items: center;
+      justify-content: center; color: #fff; font-weight: 700; font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* ── LAYOUT ── */
+    .page-body {
+      padding-top: 56px;
+      display: flex; justify-content: center;
+      gap: 26px;
+      padding-left: 16px; padding-right: 16px;
+      max-width: 1260px; margin: 0 auto;
+    }
+
+    /* ── LEFT SIDEBAR ── */
+    .sidebar-left {
+      width: var(--fb-sidebar-w); flex-shrink: 0;
+      padding-top: 16px; position: sticky; top: 56px;
+      height: calc(100vh - 56px); overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .sidebar-left::-webkit-scrollbar { display: none; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 8px; border-radius: 8px; cursor: pointer;
+      font-size: 15px; font-weight: 500; color: var(--fb-text);
+      transition: background .1s;
+    }
+    .sidebar-item:hover { background: #e4e6eb; }
+    .sidebar-item.active { background: #e7f3ff; color: var(--fb-blue); }
+    .sidebar-icon { font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #e4e6eb; }
+    .sidebar-item.active .sidebar-icon { background: #cce0ff; }
+    .sidebar-divider { height: 1px; background: var(--fb-border); margin: 8px 0; }
+    .sidebar-section { font-size: 17px; font-weight: 700; color: var(--fb-text); padding: 8px 8px 4px; }
+    .sidebar-sub { font-size: 15px; font-weight: 700; color: var(--fb-muted); padding: 4px 8px; }
+    .friend-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 8px; border-radius: 8px; cursor: pointer;
+      font-size: 15px; font-weight: 500;
+    }
+    .friend-item:hover { background: #e4e6eb; }
+    .friend-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #e4e6eb, #c9ccd3); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; }
+    .friend-online { width: 12px; height: 12px; border-radius: 50%; background: #31a24c; border: 2px solid #fff; position: absolute; bottom: 0; right: 0; }
+
+    /* ── FEED ── */
+    .feed {
+      width: var(--fb-feed-w); flex-shrink: 0;
+      padding-top: 16px;
+    }
+
+    /* Stories */
+    .stories-row {
+      display: flex; gap: 10px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none;
+    }
+    .stories-row::-webkit-scrollbar { display: none; }
+    .story-card {
+      flex-shrink: 0; width: 115px; height: 200px;
+      border-radius: 12px; overflow: hidden; cursor: pointer;
+      position: relative;
+    }
+    .story-card-bg {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 10px 8px;
+    }
+    .story-card-avatar {
+      position: absolute; top: 10px; left: 10px;
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 3px solid var(--fb-blue); background: #e4e6eb;
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .story-card-name { color: #fff; font-size: 13px; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+    .story-add-card { background: #fff; border: 1px solid var(--fb-border); width: 115px; height: 200px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 14px; cursor: pointer; flex-shrink: 0; }
+    .story-add-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--fb-blue); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; margin-bottom: 8px; }
+    .story-add-label { font-size: 13px; font-weight: 700; text-align: center; }
+
+    /* Post composer */
+    .post-composer {
+      background: #fff; border-radius: 10px; border: 1px solid var(--fb-border);
+      padding: 12px 16px; margin-bottom: 16px;
+    }
+    .composer-top { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .composer-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--fb-blue); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; flex-shrink: 0; }
+    .composer-input {
+      flex: 1; background: #f0f2f5; border: none; border-radius: 20px;
+      padding: 10px 16px; font-size: 17px; color: var(--fb-muted); cursor: pointer;
+    }
+    .composer-actions { display: flex; gap: 4px; padding-top: 8px; border-top: 1px solid var(--fb-border); }
+    .composer-action { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--fb-muted); }
+    .composer-action:hover { background: #f0f2f5; }
+
+    /* Generic post */
+    .post {
+      background: #fff; border-radius: 10px; border: 1px solid var(--fb-border);
+      margin-bottom: 16px; overflow: hidden;
+    }
+    .post-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 8px; }
+    .post-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #e4e6eb, #c9ccd3); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .post-author { font-size: 15px; font-weight: 700; }
+    .post-meta { font-size: 13px; color: var(--fb-muted); display: flex; align-items: center; gap: 4px; }
+    .post-more { margin-left: auto; font-size: 22px; color: var(--fb-muted); cursor: pointer; padding: 0 4px; }
+    .post-body { padding: 4px 16px 12px; font-size: 15px; line-height: 1.6; }
+    .post-img { width: 100%; height: 340px; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 64px; }
+    .post-img.cars { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+    .post-img.food { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
+    .post-img.friends { background: linear-gradient(135deg, #d4fc79, #96e6a1); }
+    .post-img.news { background: linear-gradient(135deg, #fbc2eb, #a18cd1); }
+    .post-stats { display: flex; justify-content: space-between; padding: 8px 16px; font-size: 15px; color: var(--fb-muted); }
+    .post-stats a { color: var(--fb-muted); text-decoration: none; cursor: pointer; }
+    .post-stats a:hover { text-decoration: underline; }
+    .post-actions-bar { display: flex; border-top: 1px solid var(--fb-border); }
+    .post-action-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: 600; color: var(--fb-muted); margin: 4px; }
+    .post-action-btn:hover { background: #f0f2f5; }
+    .sponsored-tag { font-size: 13px; color: var(--fb-muted); display: flex; align-items: center; gap: 4px; }
+
+    /* ═══════════════════════════════════════
+       TD EASY SWITCH AD
+    ═══════════════════════════════════════ */
+    .td-ad {
+      background: #fff; border-radius: 10px; border: 1px solid var(--fb-border);
+      margin-bottom: 16px; overflow: hidden;
+    }
+    .td-ad-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 8px; }
+    .td-logo-bubble {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--td-green);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .td-logo-text { color: #fff; font-size: 16px; font-weight: 900; letter-spacing: -1px; }
+
+    .td-ad-hero {
+      background: linear-gradient(135deg, #00A651 0%, #007A3C 50%, #004d26 100%);
+      padding: 40px 48px;
+      display: flex; align-items: center; gap: 48px;
+      position: relative; overflow: hidden;
+    }
+    .td-ad-hero::before {
+      content: ''; position: absolute;
+      top: -80px; right: -80px; width: 320px; height: 320px;
+      background: rgba(255,255,255,.06); border-radius: 50%;
+    }
+    .td-ad-hero::after {
+      content: ''; position: absolute;
+      bottom: -100px; left: -40px; width: 260px; height: 260px;
+      background: rgba(255,255,255,.04); border-radius: 50%;
+    }
+    .td-ad-copy { flex: 1; position: relative; z-index: 1; }
+    .td-ad-eyebrow {
+      display: inline-block; background: rgba(255,255,255,.2); color: #fff;
+      font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 20px; margin-bottom: 14px;
+    }
+    .td-ad-headline { color: #fff; font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+    .td-ad-subhead { color: rgba(255,255,255,.85); font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
+    .td-ad-steps { display: flex; gap: 12px; }
+    .td-ad-step {
+      background: rgba(255,255,255,.15); border-radius: 12px;
+      padding: 14px 16px; text-align: center; flex: 1;
+    }
+    .td-ad-step-icon { font-size: 24px; margin-bottom: 6px; }
+    .td-ad-step-label { font-size: 12px; color: rgba(255,255,255,.9); font-weight: 600; line-height: 1.4; }
+    .td-ad-visual {
+      flex-shrink: 0; width: 200px; position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 10px; align-items: center;
+    }
+    .td-ad-phone {
+      width: 160px; height: 100px; background: rgba(255,255,255,.15);
+      border-radius: 14px; border: 2px solid rgba(255,255,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+    }
+    .td-ad-arrow { color: rgba(255,255,255,.7); font-size: 28px; }
+    .td-ad-check {
+      width: 160px; background: rgba(255,255,255,.15);
+      border-radius: 14px; border: 2px solid rgba(255,255,255,.3);
+      padding: 10px 14px;
+    }
+    .td-ad-check-row { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.9); font-size: 12px; font-weight: 600; padding: 3px 0; }
+
+    .td-ad-cta-strip {
+      background: #fff; border-top: 1px solid var(--fb-border);
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .td-ad-cta-url { font-size: 12px; color: var(--fb-muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
+    .td-ad-cta-title { font-size: 17px; font-weight: 700; }
+    .td-ad-cta-desc { font-size: 14px; color: var(--fb-muted); }
+    .td-ad-cta-btn {
+      background: var(--fb-blue); color: #fff; border: none; border-radius: 8px;
+      padding: 10px 20px; font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap;
+      transition: background .1s;
+    }
+    .td-ad-cta-btn:hover { background: var(--fb-blue-d); }
+
+    /* ── RIGHT SIDEBAR ── */
+    .sidebar-right {
+      width: var(--fb-right-w); flex-shrink: 0;
+      padding-top: 16px; position: sticky; top: 56px;
+      height: calc(100vh - 56px); overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .sidebar-right::-webkit-scrollbar { display: none; }
+    .right-section { margin-bottom: 16px; }
+    .right-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .sponsored-card { background: #fff; border-radius: 10px; border: 1px solid var(--fb-border); padding: 14px; margin-bottom: 8px; cursor: pointer; }
+    .sponsored-card:hover { background: #f0f2f5; }
+    .sponsored-card-img { width: 100%; height: 120px; border-radius: 8px; background: linear-gradient(135deg, #e4e6eb, #c9ccd3); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 8px; }
+    .sponsored-card-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .sponsored-card-url { font-size: 12px; color: var(--fb-muted); }
+    .event-item { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--fb-border); cursor: pointer; }
+    .event-item:last-child { border-bottom: none; }
+    .event-date { width: 44px; text-align: center; }
+    .event-month { font-size: 11px; font-weight: 700; color: var(--fb-blue); text-transform: uppercase; }
+    .event-day { font-size: 20px; font-weight: 800; }
+    .event-info { flex: 1; }
+    .event-name { font-size: 14px; font-weight: 700; }
+    .event-meta { font-size: 13px; color: var(--fb-muted); }
+
+    /* ── UPLOAD MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.5);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; width: 100%; max-width: 520px;
+      border-radius: 16px; overflow: hidden;
+      animation: fadeScaleIn .2s ease;
+      max-height: 90vh; overflow-y: auto;
+    }
+    @keyframes fadeScaleIn {
+      from { opacity: 0; transform: scale(.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--fb-border);
+      position: sticky; top: 0; background: #fff; z-index: 1;
+    }
+    .modal-title { font-size: 20px; font-weight: 800; }
+    .modal-close { width: 36px; height: 36px; border-radius: 50%; background: #e4e6eb; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+    .modal-body { padding: 20px; }
+    .modal-section { margin-bottom: 20px; }
+    .modal-label { font-size: 13px; font-weight: 700; color: var(--fb-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+    .modal-row { display: flex; gap: 10px; }
+    .modal-input {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--fb-border); border-radius: 10px;
+      font-size: 15px; font-family: var(--font); background: #fff;
+      transition: border-color .15s;
+    }
+    .modal-input:focus { outline: none; border-color: var(--td-green); }
+    .contact-pref { display: flex; gap: 8px; margin-bottom: 10px; }
+    .pref-btn {
+      flex: 1; padding: 10px; border-radius: 10px;
+      border: 1.5px solid var(--fb-border); background: #fff;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; color: var(--fb-text);
+    }
+    .pref-btn.active { border-color: var(--td-green); background: var(--td-green-pale); color: var(--td-green-d); }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed var(--fb-border); border-radius: 14px;
+      padding: 40px 24px; text-align: center;
+      background: #fafafa; cursor: pointer; transition: all .2s;
+      position: relative;
+    }
+    .drop-zone.drag-over { border-color: var(--td-green); background: var(--td-green-pale); }
+    .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .drop-icon { font-size: 44px; margin-bottom: 12px; }
+    .drop-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .drop-sub { font-size: 14px; color: var(--fb-muted); margin-bottom: 14px; }
+    .drop-link { color: var(--fb-blue); font-weight: 700; text-decoration: none; }
+    .drop-types { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .drop-type { background: #e4e6eb; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--fb-muted); }
+    .file-preview { display: none; align-items: center; gap: 12px; padding: 14px; background: var(--td-green-pale); border-radius: 12px; margin-top: 12px; }
+    .file-preview.show { display: flex; }
+    .file-preview-icon { font-size: 32px; }
+    .file-preview-info { flex: 1; }
+    .file-preview-name { font-size: 15px; font-weight: 700; }
+    .file-preview-size { font-size: 13px; color: var(--fb-muted); }
+    .file-remove { font-size: 20px; cursor: pointer; color: var(--fb-muted); }
+
+    .submit-btn {
+      width: 100%; padding: 14px;
+      background: var(--td-green); color: #fff;
+      border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 800; cursor: pointer;
+      transition: background .15s; margin-top: 4px;
+    }
+    .submit-btn:hover { background: var(--td-green-d); }
+    .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+    .fine-print { font-size: 12px; color: var(--fb-muted); text-align: center; margin-top: 12px; line-height: 1.5; }
+
+    /* Success */
+    .success-screen { display: none; padding: 24px 20px; }
+    .success-screen.show { display: block; }
+    .modal-body.hidden { display: none; }
+    .success-check { text-align: center; margin-bottom: 20px; }
+    .success-check-icon { font-size: 60px; animation: popIn .4s ease; }
+    @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+    .success-title { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 6px; }
+    .success-sub { font-size: 15px; color: var(--fb-muted); text-align: center; margin-bottom: 20px; }
+    .extracted-card { background: #f9fafb; border: 1.5px solid var(--fb-border); border-radius: 14px; overflow: hidden; margin-bottom: 14px; }
+    .extracted-header { background: var(--td-green); color: #fff; padding: 10px 16px; font-size: 13px; font-weight: 700; }
+    .extracted-row { display: flex; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--fb-border); font-size: 14px; }
+    .extracted-row:last-child { border-bottom: none; }
+    .extracted-key { color: var(--fb-muted); }
+    .extracted-val { font-weight: 700; }
+    .confirm-btns { display: flex; gap: 10px; margin-top: 8px; }
+    .btn-no { flex: 1; padding: 13px; border: 1.5px solid var(--fb-border); background: #fff; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .btn-yes { flex: 2; padding: 13px; background: var(--td-green); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .btn-yes:hover { background: var(--td-green-d); }
+
+    /* Quote sent */
+    .quote-sent { display: none; padding: 40px 24px; text-align: center; }
+    .quote-sent.show { display: block; }
+    .call-icon { font-size: 72px; margin-bottom: 16px; animation: ring .6s ease infinite alternate; }
+    @keyframes ring { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+    .quote-sent-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .quote-sent-sub { font-size: 16px; color: var(--fb-muted); line-height: 1.6; }
+    .td-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--td-green-pale); color: var(--td-green-d); border-radius: 20px; padding: 8px 16px; font-size: 14px; font-weight: 700; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ TOP NAV ══ -->
+  <nav class="fb-topnav">
+    <div class="nav-left">
+      <div class="fb-logo">f</div>
+      <input class="nav-search" type="text" placeholder="🔍 Search Facebook" />
+    </div>
+    <div class="nav-center">
+      <div class="nav-tab active">🏠</div>
+      <div class="nav-tab">📺</div>
+      <div class="nav-tab">🛒</div>
+      <div class="nav-tab">👥</div>
+      <div class="nav-tab">🎮</div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-btn">⬛</div>
+      <div class="nav-btn">💬</div>
+      <div class="nav-btn">🔔</div>
+      <div class="nav-avatar">J</div>
+    </div>
+  </nav>
+
+  <!-- ══ PAGE BODY ══ -->
+  <div class="page-body">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar-left">
+      <div class="sidebar-item active">
+        <div class="sidebar-icon">👤</div> John Pierce
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">👥</div> Friends
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">🕐</div> Memories
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">🔖</div> Saved
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">👥</div> Groups
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">📺</div> Video
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">🛒</div> Marketplace
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">Your shortcuts</div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">🍁</div> Canada News
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">🚗</div> Car Enthusiasts
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">🏙️</div> Toronto Events
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-sub">See more</div>
+    </div>
+
+    <!-- FEED -->
+    <div class="feed">
+
+      <!-- Stories -->
+      <div class="stories-row">
+        <div class="story-add-card">
+          <div style="width:100%;height:100px;background:linear-gradient(135deg,#e4e6eb,#c9ccd3);border-radius:8px 8px 0 0;margin:-14px -14px 0;display:flex;align-items:center;justify-content:center;font-size:40px;">👤</div>
+          <div class="story-add-circle" style="margin-top:8px;">➕</div>
+          <div class="story-add-label">Create Story</div>
+        </div>
+        <div class="story-card" style="background:linear-gradient(160deg,#d4fc79,#96e6a1);">
+          <div class="story-card-avatar">👩</div>
+          <div class="story-card-bg">
+            <div class="story-card-name">Sarah M.</div>
+          </div>
+        </div>
+        <div class="story-card" style="background:linear-gradient(160deg,#a1c4fd,#c2e9fb);">
+          <div class="story-card-avatar">👨</div>
+          <div class="story-card-bg">
+            <div class="story-card-name">Mike T.</div>
+          </div>
+        </div>
+        <div class="story-card" style="background:linear-gradient(160deg,#ffecd2,#fcb69f);">
+          <div class="story-card-avatar">🧑‍🦱</div>
+          <div class="story-card-bg">
+            <div class="story-card-name">Jessica K.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Composer -->
+      <div class="post-composer">
+        <div class="composer-top">
+          <div class="composer-avatar">J</div>
+          <div class="composer-input">What's on your mind, John?</div>
+        </div>
+        <div class="composer-actions">
+          <div class="composer-action">📹 Live video</div>
+          <div class="composer-action">🖼️ Photo/video</div>
+          <div class="composer-action">😊 Feeling/activity</div>
+        </div>
+      </div>
+
+      <!-- Post 1 -->
+      <div class="post">
+        <div class="post-header">
+          <div class="post-avatar">👨‍👩‍👧</div>
+          <div>
+            <div class="post-author">David Leblanc</div>
+            <div class="post-meta">2 hrs · 🌐</div>
+          </div>
+          <div class="post-more">···</div>
+        </div>
+        <div class="post-body">Just got back from the cottage — what an amazing long weekend! The drive up was smooth and the weather was absolutely perfect 🌞🍁 Nothing better than a Canadian summer road trip.</div>
+        <div class="post-img friends">🏕️</div>
+        <div class="post-stats">
+          <span>👍❤️😆 142</span>
+          <span><a>18 comments</a> · <a>4 shares</a></span>
+        </div>
+        <div class="post-actions-bar">
+          <div class="post-action-btn">👍 Like</div>
+          <div class="post-action-btn">💬 Comment</div>
+          <div class="post-action-btn">↗️ Share</div>
+        </div>
+      </div>
+
+      <!-- Post 2 -->
+      <div class="post">
+        <div class="post-header">
+          <div class="post-avatar">🍕</div>
+          <div>
+            <div class="post-author">Toronto Foodies</div>
+            <div class="post-meta">4 hrs · 🌐</div>
+          </div>
+          <div class="post-more">···</div>
+        </div>
+        <div class="post-body">New ramen spot just opened on Queen West and it is absolutely 🔥🍜 The broth is incredible — been twice this week already. Anyone else tried it yet?</div>
+        <div class="post-img food">🍜</div>
+        <div class="post-stats">
+          <span>❤️😋👍 318</span>
+          <span><a>47 comments</a></span>
+        </div>
+        <div class="post-actions-bar">
+          <div class="post-action-btn">👍 Like</div>
+          <div class="post-action-btn">💬 Comment</div>
+          <div class="post-action-btn">↗️ Share</div>
+        </div>
+      </div>
+
+      <!-- Post 3 — cars (contextually relevant before ad) -->
+      <div class="post">
+        <div class="post-header">
+          <div class="post-avatar">🚗</div>
+          <div>
+            <div class="post-author">Canadian Car Enthusiasts</div>
+            <div class="post-meta">5 hrs · 🌐</div>
+          </div>
+          <div class="post-more">···</div>
+        </div>
+        <div class="post-body">2025 model year deals are getting insane right now. Anyone else shopping around for better auto insurance rates? I just found out I was overpaying by over $600 a year 😤 Time to switch.</div>
+        <div class="post-img cars">🚗</div>
+        <div class="post-stats">
+          <span>😤👍 89</span>
+          <span><a>23 comments</a> · <a>11 shares</a></span>
+        </div>
+        <div class="post-actions-bar">
+          <div class="post-action-btn">👍 Like</div>
+          <div class="post-action-btn">💬 Comment</div>
+          <div class="post-action-btn">↗️ Share</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════
+           ✨ TD EASY SWITCH AD ✨
+      ══════════════════════════════ -->
+      <div class="td-ad">
+        <div class="td-ad-header">
+          <div class="td-logo-bubble"><span class="td-logo-text">TD</span></div>
+          <div>
+            <div class="post-author">TD Insurance</div>
+            <div class="post-meta sponsored-tag">Sponsored · 🌐</div>
+          </div>
+          <div class="post-more">···</div>
+        </div>
+
+        <div class="td-ad-hero">
+          <div class="td-ad-copy">
+            <div class="td-ad-eyebrow">🍁 Exclusive Easy Switch Offer</div>
+            <div class="td-ad-headline">Switch to TD Insurance in 60 seconds. No forms. Just upload.</div>
+            <div class="td-ad-subhead">Upload your current pink slip or policy document. Our AI reads it instantly and builds your personalized TD quote — no lengthy forms, no waiting on hold.</div>
+            <div class="td-ad-steps">
+              <div class="td-ad-step">
+                <div class="td-ad-step-icon">📄</div>
+                <div class="td-ad-step-label">Upload your current policy</div>
+              </div>
+              <div class="td-ad-step">
+                <div class="td-ad-step-icon">⚡</div>
+                <div class="td-ad-step-label">We scan & extract instantly</div>
+              </div>
+              <div class="td-ad-step">
+                <div class="td-ad-step-icon">💬</div>
+                <div class="td-ad-step-label">Quote ready in minutes</div>
+              </div>
+              <div class="td-ad-step">
+                <div class="td-ad-step-icon">📞</div>
+                <div class="td-ad-step-label">Advisor calls to confirm</div>
+              </div>
+            </div>
+          </div>
+          <div class="td-ad-visual">
+            <div class="td-ad-phone">📄</div>
+            <div class="td-ad-arrow">↓</div>
+            <div class="td-ad-check">
+              <div class="td-ad-check-row">✅ Name & address</div>
+              <div class="td-ad-check-row">✅ Vehicle & VIN</div>
+              <div class="td-ad-check-row">✅ Coverage type</div>
+              <div class="td-ad-check-row">✅ Policy limits</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="td-ad-cta-strip">
+          <div>
+            <div class="td-ad-cta-url">tdinsurance.com</div>
+            <div class="td-ad-cta-title">TD Easy Switch — Instant Quote</div>
+            <div class="td-ad-cta-desc">Upload your policy and get a personalized quote in minutes</div>
+          </div>
+          <button class="td-ad-cta-btn" onclick="openModal()">Get My Quote →</button>
+        </div>
+
+        <div class="post-stats">
+          <span>👍❤️ 2,841</span>
+          <span><a>194 comments</a> · <a>567 shares</a></span>
+        </div>
+        <div class="post-actions-bar">
+          <div class="post-action-btn">👍 Like</div>
+          <div class="post-action-btn">💬 Comment</div>
+          <div class="post-action-btn">↗️ Share</div>
+        </div>
+      </div>
+
+      <!-- Post 4 (below ad) -->
+      <div class="post">
+        <div class="post-header">
+          <div class="post-avatar">📰</div>
+          <div>
+            <div class="post-author">CBC News</div>
+            <div class="post-meta">6 hrs · 🌐</div>
+          </div>
+          <div class="post-more">···</div>
+        </div>
+        <div class="post-body">Ontario auto insurance rates: what's changing in 2025 and how to make sure you're not overpaying →</div>
+        <div class="post-img news">📰</div>
+        <div class="post-stats">
+          <span>😮👍 1,203</span>
+          <span><a>445 comments</a> · <a>288 shares</a></span>
+        </div>
+        <div class="post-actions-bar">
+          <div class="post-action-btn">👍 Like</div>
+          <div class="post-action-btn">💬 Comment</div>
+          <div class="post-action-btn">↗️ Share</div>
+        </div>
+      </div>
+
+    </div><!-- /feed -->
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar-right">
+      <div class="right-section">
+        <div class="right-title">Sponsored</div>
+        <div class="sponsored-card">
+          <div class="sponsored-card-img">🏠</div>
+          <div class="sponsored-card-name">RBC Home Insurance</div>
+          <div class="sponsored-card-url">rbcinsurance.com</div>
+        </div>
+        <div class="sponsored-card">
+          <div class="sponsored-card-img">🚗</div>
+          <div class="sponsored-card-name">CAA Auto Insurance</div>
+          <div class="sponsored-card-url">caa.ca</div>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <div class="right-title">Upcoming events</div>
+        <div class="event-item">
+          <div class="event-date">
+            <div class="event-month">Aug</div>
+            <div class="event-day">22</div>
+          </div>
+          <div class="event-info">
+            <div class="event-name">Toronto Auto Show Preview</div>
+            <div class="event-meta">Metro Convention Centre</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-date">
+            <div class="event-month">Sep</div>
+            <div class="event-day">5</div>
+          </div>
+          <div class="event-info">
+            <div class="event-name">Labour Day Weekend BBQ</div>
+            <div class="event-meta">Ashbridges Bay Park</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-date">
+            <div class="event-month">Sep</div>
+            <div class="event-day">14</div>
+          </div>
+          <div class="event-info">
+            <div class="event-name">TIFF Opening Night</div>
+            <div class="event-meta">Roy Thomson Hall</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <div class="right-title">Contacts</div>
+        <div class="friend-item">
+          <div class="friend-avatar">👩<span class="friend-online"></span></div>
+          Sarah Mitchell
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar">👨<span class="friend-online"></span></div>
+          Mike Torres
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar">🧑‍🦱</div>
+          Jessica Kowalski
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar">👩‍🦰</div>
+          Amanda Chen
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-body -->
+
+
+  <!-- ══════════════════════════════════════
+       UPLOAD MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-box">
+
+      <!-- FORM -->
+      <div id="modal-form">
+        <div class="modal-header">
+          <div class="modal-title">TD Easy Switch</div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-section">
+            <div class="modal-label">Your Name</div>
+            <div class="modal-row">
+              <input class="modal-input" type="text" placeholder="First name" id="fname" style="flex:1;" />
+              <input class="modal-input" type="text" placeholder="Last name" id="lname" style="flex:1;" />
+            </div>
+          </div>
+          <div class="modal-section">
+            <div class="modal-label">Preferred Contact</div>
+            <div class="contact-pref">
+              <button class="pref-btn active" id="pref-sms" onclick="setPref('sms')">📱 SMS</button>
+              <button class="pref-btn" id="pref-email" onclick="setPref('email')">✉️ Email</button>
+            </div>
+            <input class="modal-input" type="tel" id="contact-value" placeholder="Mobile number" />
+          </div>
+          <div class="modal-section">
+            <div class="modal-label">Upload Your Policy Document</div>
+            <div class="drop-zone" id="drop-zone">
+              <input type="file" accept="image/*,.pdf" id="file-input" onchange="handleFile(this.files[0])" />
+              <div class="drop-icon">📄</div>
+              <div class="drop-title">Drag & drop your pink slip or policy here</div>
+              <div class="drop-sub">or <span class="drop-link">click to browse</span> — photo, scan, or PDF</div>
+              <div class="drop-types">
+                <span class="drop-type">JPG</span>
+                <span class="drop-type">PNG</span>
+                <span class="drop-type">PDF</span>
+                <span class="drop-type">HEIC</span>
+              </div>
+            </div>
+            <div class="file-preview" id="file-preview">
+              <div class="file-preview-icon" id="file-icon">📄</div>
+              <div class="file-preview-info">
+                <div class="file-preview-name" id="file-name">document.pdf</div>
+                <div class="file-preview-size" id="file-size">2.3 MB · Ready to upload</div>
+              </div>
+              <div class="file-remove" onclick="removeFile()">✕</div>
+            </div>
+          </div>
+          <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>Scan My Policy & Get a Quote</button>
+          <div class="fine-print">By submitting, you agree to be contacted by a TD Insurance advisor. Your document is securely processed and not stored long-term.</div>
+        </div>
+      </div>
+
+      <!-- EXTRACTED DATA CONFIRMATION -->
+      <div class="success-screen" id="success-screen">
+        <div class="success-check"><div class="success-check-icon">✅</div></div>
+        <div class="success-title">Policy Scanned Successfully!</div>
+        <div class="success-sub">Here's what we found. Please confirm this looks correct before we generate your quote.</div>
+        <div class="extracted-card">
+          <div class="extracted-header">👤 Personal Information</div>
+          <div class="extracted-row"><span class="extracted-key">Name</span><span class="extracted-val" id="ex-name">—</span></div>
+          <div class="extracted-row"><span class="extracted-key">Address</span><span class="extracted-val">42 Maple Ave, Toronto ON M4K 1A1</span></div>
+        </div>
+        <div class="extracted-card">
+          <div class="extracted-header">🚗 Vehicle Information</div>
+          <div class="extracted-row"><span class="extracted-key">Vehicle</span><span class="extracted-val">2021 Honda Civic LX</span></div>
+          <div class="extracted-row"><span class="extracted-key">VIN</span><span class="extracted-val">2HGFE2F59MH502841</span></div>
+        </div>
+        <div class="extracted-card">
+          <div class="extracted-header">🛡️ Current Coverage</div>
+          <div class="extracted-row"><span class="extracted-key">Insurer</span><span class="extracted-val">Aviva Canada</span></div>
+          <div class="extracted-row"><span class="extracted-key">Coverage</span><span class="extracted-val">Comprehensive + Collision</span></div>
+          <div class="extracted-row"><span class="extracted-key">Liability</span><span class="extracted-val">$2,000,000</span></div>
+          <div class="extracted-row"><span class="extracted-key">Deductible</span><span class="extracted-val">$500 / $1,000</span></div>
+          <div class="extracted-row"><span class="extracted-key">Policy Expires</span><span class="extracted-val">March 15, 2026</span></div>
+        </div>
+        <div class="success-sub" style="margin-top:4px;">Would you like a TD quote based on this information?</div>
+        <div class="confirm-btns">
+          <button class="btn-no" onclick="closeModal()">No thanks</button>
+          <button class="btn-yes" onclick="requestQuote()">✅ Yes, get my TD quote</button>
+        </div>
+      </div>
+
+      <!-- QUOTE SENT -->
+      <div class="quote-sent" id="quote-sent">
+        <div class="call-icon">📞</div>
+        <div class="quote-sent-title">Your quote is ready!</div>
+        <div class="quote-sent-sub">A TD Insurance advisor will be calling you shortly to walk through your personalized quote. This usually takes less than 5 minutes.</div>
+        <div class="td-badge">
+          <span style="background:var(--td-green);color:#fff;border-radius:6px;padding:2px 10px;font-size:12px;font-weight:900;">TD</span>
+          Secure · No obligation · 5 min call
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedPref = 'sms';
+    let selectedFile = null;
+
+    function openModal() {
+      document.getElementById('modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      document.getElementById('modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function setPref(pref) {
+      selectedPref = pref;
+      document.getElementById('pref-sms').classList.toggle('active', pref === 'sms');
+      document.getElementById('pref-email').classList.toggle('active', pref === 'email');
+      const input = document.getElementById('contact-value');
+      if (pref === 'sms') { input.type = 'tel'; input.placeholder = 'Mobile number'; }
+      else { input.type = 'email'; input.placeholder = 'Email address'; }
+    }
+    function handleFile(file) {
+      if (!file) return;
+      selectedFile = file;
+      const icons = { 'application/pdf': '📋', 'image/jpeg': '🖼️', 'image/png': '🖼️', 'image/heic': '🖼️' };
+      document.getElementById('file-icon').textContent = icons[file.type] || '📄';
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-size').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB · Ready to upload';
+      document.getElementById('file-preview').classList.add('show');
+      document.getElementById('submit-btn').disabled = false;
+    }
+    function removeFile() {
+      selectedFile = null;
+      document.getElementById('file-preview').classList.remove('show');
+      document.getElementById('submit-btn').disabled = true;
+      document.getElementById('file-input').value = '';
+    }
+    function submitForm() {
+      const fname = document.getElementById('fname').value.trim() || 'John';
+      const lname = document.getElementById('lname').value.trim() || 'Smith';
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = '⏳ Scanning document...';
+      btn.disabled = true;
+      setTimeout(() => {
+        document.getElementById('ex-name').textContent = fname + ' ' + lname;
+        document.getElementById('modal-form').style.display = 'none';
+        document.getElementById('success-screen').classList.add('show');
+      }, 2200);
+    }
+    function requestQuote() {
+      document.getElementById('success-screen').classList.remove('show');
+      document.getElementById('quote-sent').classList.add('show');
+    }
+
+    const dz = document.getElementById('drop-zone');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+</body>
+</html>
