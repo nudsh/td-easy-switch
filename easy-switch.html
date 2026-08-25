@@ -669,25 +669,51 @@
     </div>`;
   }
 
+  /* ── VERSION state (per view) ── */
+  const vState = { mobile: { ver: 1, time: 'afternoon' }, desktop: { ver: 1, time: 'afternoon' } };
+
+  const TIME_LABELS = {
+    morning:   'This morning (8 am – 12 pm)',
+    afternoon: 'This afternoon (12 pm – 5 pm)',
+    evening:   'This evening (5 pm – 8 pm)'
+  };
+
   /* TD landing page screens — upload, confirm, sent */
   function tdUploadScreen(viewId) {
     return `
     <div class="td-landing-hero">
       <div class="td-hero-eyebrow">🍁 Easy Switch — Exclusive Offer</div>
       <div class="td-hero-headline">Your quote is already in your hands.<br>Just upload it.</div>
-      <div class="td-hero-sub">Skip the form. Upload your current policy document or pink slip — we'll read it and build your personalized TD quote in seconds.</div>
+      <div class="td-hero-sub">Skip the form. Upload your current insurance policy document — we'll read it and a TD advisor will call you with your personalized quote.</div>
       <div class="td-hero-steps">
-        <div class="td-hero-step"><div class="td-hero-step-icon">📄</div><div class="td-hero-step-label">Upload your<br>current policy</div></div>
+        <div class="td-hero-step"><div class="td-hero-step-icon">📄</div><div class="td-hero-step-label">Upload your<br>policy document</div></div>
         <div class="td-hero-step"><div class="td-hero-step-icon">🔍</div><div class="td-hero-step-label">We scan it<br>instantly</div></div>
         <div class="td-hero-step"><div class="td-hero-step-icon">📋</div><div class="td-hero-step-label">Confirm your<br>details</div></div>
         <div class="td-hero-step"><div class="td-hero-step-icon">📞</div><div class="td-hero-step-label">Advisor<br>calls you</div></div>
       </div>
     </div>
     <div class="td-upload-section">
+
+      <!-- V1/V2 toggle -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:24px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;">Demo Experience</div>
+          <div style="font-size:13px;color:#666;margin-top:3px;" id="ver-desc-${viewId}">V1 · Wait &amp; Review — scan results shown immediately</div>
+        </div>
+        <div style="display:flex;background:#e5e7eb;border-radius:999px;padding:4px;gap:2px;">
+          <button onclick="setVer('${viewId}',1)" id="vbtn1-${viewId}"
+            style="padding:6px 14px;border-radius:999px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:#fff;color:#00A651;box-shadow:0 1px 5px rgba(0,0,0,.12);">
+            V1 — Wait &amp; Review</button>
+          <button onclick="setVer('${viewId}',2)" id="vbtn2-${viewId}"
+            style="padding:6px 14px;border-radius:999px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:transparent;color:#6b7280;">
+            V2 — Drop &amp; Go</button>
+        </div>
+      </div>
+
       <div class="td-trust-bar">
         <div class="td-trust-item">🔒 Bank-level security</div>
         <div class="td-trust-item">🍁 TD Canada Trust</div>
-        <div class="td-trust-item">⚡ 60-second quote</div>
+        <div class="td-trust-item">⚡ Quick &amp; easy</div>
       </div>
       <div class="td-section-title">Tell us who you are</div>
       <div class="td-section-sub">Just your name and how you'd like to be reached — that's it.</div>
@@ -706,17 +732,36 @@
         <div class="td-field"><label>&nbsp;</label><input type="tel" id="td-contact-${viewId}" placeholder="Mobile number"/></div>
       </div>
 
+      <!-- V2 only: best time to call -->
+      <div id="calltime-${viewId}" style="display:none;margin:16px 0;">
+        <div style="font-size:12px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Best time to call you</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="time-btn" id="time-morning-${viewId}" onclick="setTime('${viewId}','morning')"
+            style="flex:1;min-width:100px;padding:12px 8px;border-radius:12px;border:1.5px solid #d1d5db;background:#fff;font-size:13px;font-weight:600;cursor:pointer;text-align:center;">
+            🌅<br><strong>Morning</strong><br><span style="font-size:11px;color:#888;">8 am–12 pm</span>
+          </button>
+          <button class="time-btn active" id="time-afternoon-${viewId}" onclick="setTime('${viewId}','afternoon')"
+            style="flex:1;min-width:100px;padding:12px 8px;border-radius:12px;border:1.5px solid #6366f1;background:#ede9fe;font-size:13px;font-weight:600;cursor:pointer;text-align:center;color:#5b21b6;">
+            ☀️<br><strong>Afternoon</strong><br><span style="font-size:11px;">12–5 pm</span>
+          </button>
+          <button class="time-btn" id="time-evening-${viewId}" onclick="setTime('${viewId}','evening')"
+            style="flex:1;min-width:100px;padding:12px 8px;border-radius:12px;border:1.5px solid #d1d5db;background:#fff;font-size:13px;font-weight:600;cursor:pointer;text-align:center;">
+            🌙<br><strong>Evening</strong><br><span style="font-size:11px;color:#888;">5–8 pm</span>
+          </button>
+        </div>
+      </div>
+
       <div style="height:20px;"></div>
       <div class="td-section-title">Upload your policy document</div>
-      <div class="td-section-sub">Pink slip, full policy PDF, or even a photo of your insurance card — we can read them all.</div>
+      <div class="td-section-sub">Please upload your <strong>full insurance policy document</strong> — not just your pink slip or insurance card. The full policy has the coverage details we need. Works with Aviva, Intact, Desjardins, Belairdirect, and more.</div>
 
       <div class="td-drop-zone" id="dz-${viewId}">
         <input type="file" accept="image/*,.pdf" id="fi-${viewId}" onchange="handleFile('${viewId}',this.files[0])"/>
         <span class="dz-icon">📄</span>
-        <div class="dz-title">Drag & drop your document here</div>
-        <div class="dz-sub">Pink slip · Policy PDF · Photo of insurance card<br>We accept photos taken on your phone</div>
+        <div class="dz-title">Drag &amp; drop your policy document here</div>
+        <div class="dz-sub">Full policy PDF or clear photos of each page<br><strong>Note:</strong> pink slip / insurance card alone is not sufficient</div>
         <div class="dz-or"><div class="dz-or-line"></div><div class="dz-or-text">or</div><div class="dz-or-line"></div></div>
-        <button class="dz-upload-btn" onclick="event.stopPropagation();document.getElementById('fi-${viewId}').click()">📂 Browse & Upload</button>
+        <button class="dz-upload-btn" onclick="event.stopPropagation();document.getElementById('fi-${viewId}').click()">📂 Browse &amp; Upload</button>
         <div class="dz-types">
           <span class="dz-type">JPG</span><span class="dz-type">PNG</span>
           <span class="dz-type">HEIC</span><span class="dz-type">PDF</span>
@@ -727,7 +772,7 @@
         <div><div class="fp-name" id="fp-name-${viewId}">—</div><div class="fp-size" id="fp-size-${viewId}">—</div></div>
         <span class="fp-remove" onclick="removeFile('${viewId}')">✕</span>
       </div>
-      <button class="td-submit-btn" id="sub-${viewId}" onclick="submitForm('${viewId}')" disabled>🔍 Scan My Policy & Get a Quote</button>
+      <button class="td-submit-btn" id="sub-${viewId}" onclick="submitForm('${viewId}')" disabled>🔍 Scan My Policy &amp; Get a Quote</button>
       <div class="td-fine-print">By submitting you agree to be contacted by a TD Insurance advisor. Your document is securely processed and not stored long-term.</div>
     </div>`;
   }
@@ -766,17 +811,34 @@
     </div>`;
   }
 
-  function tdSentScreen() {
+  function tdSentScreen(vid) {
+    const v = vState[vid] || { ver: 1, time: 'afternoon' };
+    if (v.ver === 2) {
+      return `
+      <div class="td-upload-section" style="text-align:center;padding-top:40px;">
+        <span style="font-size:80px;display:block;margin-bottom:16px;">✉️</span>
+        <div style="font-size:24px;font-weight:900;color:#1a1a1a;margin-bottom:10px;">Thanks — we've got your document!</div>
+        <div style="font-size:16px;color:#666;line-height:1.7;max-width:420px;margin:0 auto 24px;">We'll review your policy and have a TD advisor reach out at your preferred time.</div>
+        <div style="font-size:13px;color:#888;margin-bottom:6px;">Your advisor will call you</div>
+        <div style="display:inline-block;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:12px 24px;font-size:17px;font-weight:700;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+          ${TIME_LABELS[v.time]}
+        </div><br>
+        <div style="display:inline-flex;align-items:center;gap:10px;background:#ede9fe;color:#5b21b6;border-radius:24px;padding:12px 24px;font-size:15px;font-weight:700;">
+          <span style="background:#6366f1;color:#fff;border-radius:8px;padding:3px 14px;font-size:12px;font-weight:900;">TD</span>
+          Secure · No obligation · No waiting required
+        </div>
+      </div>`;
+    }
     return `
-    <div class="td-sent-section">
-      <span class="sent-icon">📞</span>
-      <div class="sent-title">Your quote is ready!</div>
-      <div class="sent-sub">A TD Insurance advisor will be calling you shortly to walk you through your personalized quote. This usually takes less than 5 minutes.</div>
-      <div class="sent-badge">
-        <span style="background:var(--td-green);color:#fff;border-radius:6px;padding:2px 12px;font-size:12px;font-weight:900;">TD</span>
-        Secure · No obligation · ~5 min call
-      </div>
-    </div>`;
+      <div class="td-upload-section" style="text-align:center;padding-top:40px;">
+        <span style="font-size:80px;display:block;margin-bottom:16px;animation:ring .6s ease infinite alternate;">📞</span>
+        <div style="font-size:24px;font-weight:900;color:#1a1a1a;margin-bottom:10px;">Your quote is on its way!</div>
+        <div style="font-size:16px;color:#666;line-height:1.7;max-width:420px;margin:0 auto 24px;">A TD Insurance advisor will be calling you shortly with your personalized quote. They already have your policy details ready.</div>
+        <div style="display:inline-flex;align-items:center;gap:10px;background:#e8f7ef;color:#007A3C;border-radius:24px;padding:12px 24px;font-size:15px;font-weight:700;">
+          <span style="background:#00A651;color:#fff;border-radius:8px;padding:3px 14px;font-size:12px;font-weight:900;">TD</span>
+          Secure · No obligation · ~5 min call
+        </div>
+      </div>`;
   }
 
   /* ──────────────────────────────────────────────────────
@@ -926,26 +988,60 @@
     const fname = (document.getElementById('td-fname-'+vid).value.trim()) || 'John';
     const lname = (document.getElementById('td-lname-'+vid).value.trim()) || 'Smith';
     const btn = document.getElementById('sub-'+vid);
-    btn.textContent = '⏳ Scanning document...'; btn.disabled = true;
-    setTimeout(() => {
-      const container = vid === 'mobile'
-        ? document.getElementById('td-mobile-content')
-        : document.getElementById('td-desktop-content');
-      container.innerHTML = tdConfirmScreen(vid, fname, lname);
-      requestAnimationFrame(() => {
-        if (vid === 'mobile') document.getElementById('screen-td-mobile').scrollTop = 0;
-        else { window.scrollTo({ top: 0, behavior: 'instant' }); }
-      });
-    }, 2200);
+    const ver = (vState[vid] || {}).ver || 1;
+
+    if (ver === 2) {
+      btn.textContent = '⏳ Uploading...'; btn.disabled = true;
+      setTimeout(() => showSent(vid), 1200);
+    } else {
+      btn.textContent = '⏳ Scanning document...'; btn.disabled = true;
+      setTimeout(() => {
+        const container = vid === 'mobile'
+          ? document.getElementById('td-mobile-content')
+          : document.getElementById('td-desktop-content');
+        container.innerHTML = tdConfirmScreen(vid, fname, lname);
+        requestAnimationFrame(() => {
+          if (vid === 'mobile') document.getElementById('screen-td-mobile').scrollTop = 0;
+          else { window.scrollTo({ top: 0, behavior: 'instant' }); }
+        });
+      }, 2200);
+    }
   }
   function showSent(vid) {
     const container = vid === 'mobile'
       ? document.getElementById('td-mobile-content')
       : document.getElementById('td-desktop-content');
-    container.innerHTML = tdSentScreen();
+    container.innerHTML = tdSentScreen(vid);
     requestAnimationFrame(() => {
       if (vid === 'mobile') document.getElementById('screen-td-mobile').scrollTop = 0;
       else { window.scrollTo({ top: 0, behavior: 'instant' }); }
+    });
+  }
+
+  /* ─── VERSION / TIME HELPERS ─────────────────────────── */
+  function setVer(vid, v) {
+    vState[vid].ver = v;
+    const b1 = document.getElementById('vbtn1-'+vid);
+    const b2 = document.getElementById('vbtn2-'+vid);
+    if (b1) { b1.style.background = v===1?'#fff':'transparent'; b1.style.color = v===1?'#00A651':'#6b7280'; b1.style.boxShadow = v===1?'0 1px 5px rgba(0,0,0,.12)':'none'; }
+    if (b2) { b2.style.background = v===2?'#fff':'transparent'; b2.style.color = v===2?'#6366f1':'#6b7280'; b2.style.boxShadow = v===2?'0 1px 5px rgba(0,0,0,.12)':'none'; }
+    const desc = document.getElementById('ver-desc-'+vid);
+    if (desc) desc.textContent = v===1 ? 'V1 · Wait & Review — scan results shown immediately' : 'V2 · Drop & Go — submit and we\'ll call you at your preferred time';
+    const ct = document.getElementById('calltime-'+vid);
+    if (ct) ct.style.display = v===2 ? 'block' : 'none';
+    const btn = document.getElementById('sub-'+vid);
+    if (btn && !btn.disabled) btn.textContent = v===1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+  }
+
+  function setTime(vid, t) {
+    vState[vid].time = t;
+    ['morning','afternoon','evening'].forEach(x => {
+      const el = document.getElementById('time-'+x+'-'+vid);
+      if (!el) return;
+      const active = x === t;
+      el.style.borderColor = active ? '#6366f1' : '#d1d5db';
+      el.style.background  = active ? '#ede9fe' : '#fff';
+      el.style.color       = active ? '#5b21b6' : '#1a1a1a';
     });
   }
 
