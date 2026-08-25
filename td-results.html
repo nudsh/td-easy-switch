@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TD Easy Switch — Your Scanned Policy Details</title>
+  <title>TD Easy Switch — Confirm Your Details</title>
   <style>
     :root {
       --td-green:      #00A651;
@@ -33,156 +33,107 @@
     .td-header-phone { font-size: 14px; font-weight: 700; color: var(--td-green); }
 
     /* ── PROGRESS STEPPER ── */
-    .td-progress {
-      background: #fff; border-bottom: 1px solid #e0e0e0;
-      padding: 16px 32px;
-    }
-    .td-progress-inner {
-      max-width: 860px; margin: 0 auto;
-      display: flex; align-items: center;
-    }
-    .td-step {
-      display: flex; align-items: center; gap: 8px;
-      flex: 1; position: relative;
-    }
-    .td-step:not(:last-child)::after {
-      content: ""; flex: 1; height: 2px; background: #ddd; margin: 0 8px;
-    }
+    .td-progress { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 16px 32px; }
+    .td-progress-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: center; }
+    .td-step { display: flex; align-items: center; gap: 8px; flex: 1; position: relative; }
+    .td-step:not(:last-child)::after { content: ""; flex: 1; height: 2px; background: #ddd; margin: 0 8px; }
     .td-step.done:not(:last-child)::after { background: var(--td-green); }
-    .td-step-circle {
-      width: 28px; height: 28px; border-radius: 50%;
-      border: 2px solid #ddd; display: flex; align-items: center;
-      justify-content: center; font-size: 12px; font-weight: 700;
-      color: #999; background: #fff; flex-shrink: 0;
-    }
-    .td-step.done .td-step-circle  { background: var(--td-green); border-color: var(--td-green); color: #fff; }
+    .td-step-circle { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #999; background: #fff; flex-shrink: 0; }
+    .td-step.done .td-step-circle   { background: var(--td-green); border-color: var(--td-green); color: #fff; }
     .td-step.active .td-step-circle { border-color: var(--td-green); color: var(--td-green); }
     .td-step-label { font-size: 12px; font-weight: 600; color: #999; white-space: nowrap; }
     .td-step.done .td-step-label   { color: var(--td-green); }
     .td-step.active .td-step-label { color: #1a1a1a; }
 
-    /* ── MAIN ── */
-    .td-main { max-width: 860px; margin: 32px auto; padding: 0 24px 64px; display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
-    @media (max-width: 720px) { .td-main { grid-template-columns: 1fr; } }
+    /* ── MAIN — single centred column ── */
+    .td-main { max-width: 680px; margin: 32px auto; padding: 0 24px 64px; }
+    .td-main-content.hidden { display: none; }
 
     /* ── SCAN SUCCESS BANNER ── */
     .scan-banner {
       background: linear-gradient(135deg, var(--td-green) 0%, var(--td-green-d) 100%);
       border-radius: 14px; padding: 20px 24px;
-      display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
-      color: #fff;
+      display: flex; align-items: center; gap: 16px; margin-bottom: 20px; color: #fff;
     }
     .scan-banner-icon { font-size: 40px; flex-shrink: 0; }
     .scan-banner-title { font-size: 18px; font-weight: 800; margin-bottom: 3px; }
     .scan-banner-sub { font-size: 14px; opacity: .88; line-height: 1.5; }
-    .scan-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.2); border-radius:20px; padding:3px 12px; font-size:12px; font-weight:700; margin-top:6px; }
+    .scan-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.2); border-radius: 20px; padding: 3px 12px; font-size: 12px; font-weight: 700; margin-top: 6px; }
 
-    /* ── DATA CARDS ── */
-    .data-card {
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
-      overflow: hidden; margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    }
-    .data-card-header {
-      background: var(--td-green); color: #fff;
-      padding: 11px 18px; font-size: 14px; font-weight: 700;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .data-card-header .edit-link { font-size: 12px; font-weight: 600; cursor: pointer; opacity: .85; text-decoration: underline; }
-    .data-card-header .edit-link:hover { opacity: 1; }
-    .data-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 11px 18px; border-bottom: 1px solid #f5f5f5; font-size: 14px;
-    }
-    .data-row:last-child { border-bottom: none; }
-    .data-key { color: #666; flex-shrink: 0; }
-    .data-val { font-weight: 700; color: #1a1a1a; text-align: right; }
-    .data-val.highlight { color: var(--td-green); }
-    .data-val input {
-      border: 1.5px solid #d1d5db; border-radius: 8px; padding: 6px 10px;
-      font-size: 14px; font-family: var(--font); background: #fafafa; color: #1a1a1a;
-      text-align: right; width: 180px;
-    }
-    .data-val input:focus { outline: none; border-color: var(--td-green); background: #fff; }
-
-    /* Coverage pill tags */
-    .coverage-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
-    .coverage-tag { background: var(--td-green-pale); color: var(--td-green-d); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
-    .coverage-tag.warn { background: #fff3cd; color: #92400e; }
-
-    /* Scan confidence */
-    .confidence-bar-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-    .confidence-bar { width: 80px; height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
-    .confidence-fill { height: 100%; border-radius: 3px; background: var(--td-green); }
-    .confidence-label { font-size: 12px; font-weight: 600; color: var(--td-green); }
-
-    /* Notice banner */
+    /* ── NOTICE ── */
     .notice-banner {
       background: #fff8e1; border: 1px solid #f9a825; border-radius: 10px;
-      padding: 12px 16px; font-size: 13px; color: #5d4037; margin-bottom: 16px;
+      padding: 12px 16px; font-size: 13px; color: #5d4037; margin-bottom: 20px;
       display: flex; gap: 10px; align-items: flex-start; line-height: 1.55;
     }
     .notice-icon { font-size: 18px; flex-shrink: 0; }
 
-    /* ── RIGHT: QUOTE SIDEBAR ── */
-    .quote-sidebar { position: sticky; top: 90px; }
-    .quote-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-    .quote-card-header { background: var(--td-green); color: #fff; padding: 16px 20px; font-size: 15px; font-weight: 700; text-align: center; }
-    .quote-preview { padding: 20px; border-bottom: 1px solid #f0f0f0; text-align: center; }
-    .quote-label { font-size: 13px; color: #888; margin-bottom: 4px; }
-    .quote-amount { font-size: 48px; font-weight: 900; color: var(--td-green); line-height: 1; }
-    .quote-period { font-size: 14px; color: #888; margin-top: 4px; }
-    .quote-annual { font-size: 14px; color: #444; margin-top: 8px; font-weight: 600; }
-    .quote-breakdown { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; }
-    .quote-breakdown-title { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
-    .quote-breakdown-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: #555; }
-    .quote-breakdown-row span:last-child { font-weight: 600; color: #1a1a1a; }
-    .quote-savings { margin: 12px 20px; background: var(--td-green-pale); border: 1px solid var(--td-green-mid); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--td-green-d); font-weight: 700; text-align: center; }
-    .quote-cta-section { padding: 16px 20px 20px; }
-    .quote-cta-label { font-size: 13px; color: #888; text-align: center; margin-bottom: 12px; line-height: 1.5; }
+    /* ── DATA CARDS ── */
+    .data-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+    .data-card-header { background: var(--td-green); color: #fff; padding: 11px 18px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+    .edit-link { font-size: 12px; font-weight: 600; cursor: pointer; opacity: .85; text-decoration: underline; }
+    .edit-link:hover { opacity: 1; }
+    .data-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 18px; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
+    .data-row:last-child { border-bottom: none; }
+    .data-key { color: #666; flex-shrink: 0; padding-right: 16px; }
+    .data-val { font-weight: 700; color: #1a1a1a; text-align: right; }
+    .data-val.green { color: var(--td-green); }
+    .data-val.warn  { color: #92400e; font-weight: 600; font-size: 13px; }
 
-    /* THE main CTA button */
+    /* Coverage pill tags */
+    .coverage-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+    .coverage-tag { background: var(--td-green-pale); color: var(--td-green-d); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+
+    /* VIN confidence */
+    .vin-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+    .conf-bar { width: 72px; height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
+    .conf-fill { height: 100%; border-radius: 3px; background: var(--td-green); }
+    .conf-label { font-size: 12px; font-weight: 700; color: var(--td-green); }
+
+    /* ── ACTION BUTTONS ── */
+    .action-block { margin-top: 28px; }
+    .action-label { font-size: 15px; color: #555; text-align: center; margin-bottom: 16px; line-height: 1.6; }
     .btn-get-quote {
       display: block; width: 100%;
       background: var(--td-green); color: #fff;
       border: none; border-radius: 12px;
-      padding: 16px; font-size: 18px; font-weight: 900;
+      padding: 17px; font-size: 18px; font-weight: 900;
       cursor: pointer; text-align: center;
-      transition: background .15s; letter-spacing: -.2px;
+      transition: background .15s;
       box-shadow: 0 4px 16px rgba(0,166,81,.35);
+      margin-bottom: 12px;
     }
     .btn-get-quote:hover { background: var(--td-green-d); }
     .btn-secondary {
       display: block; width: 100%;
       background: #fff; color: var(--td-green);
       border: 2px solid var(--td-green); border-radius: 12px;
-      padding: 12px; font-size: 15px; font-weight: 700;
-      cursor: pointer; text-align: center; margin-top: 10px;
+      padding: 13px; font-size: 15px; font-weight: 700;
+      cursor: pointer; text-align: center;
       transition: background .15s;
     }
     .btn-secondary:hover { background: var(--td-green-pale); }
-    .advisor-note { font-size: 12px; color: #999; text-align: center; margin-top: 12px; line-height: 1.6; }
-    .advisor-note a { color: var(--td-green); font-weight: 600; text-decoration: none; }
+    .fine-print { font-size: 12px; color: #999; text-align: center; margin-top: 14px; line-height: 1.6; }
+    .fine-print a { color: var(--td-green); font-weight: 600; text-decoration: none; }
 
     /* ── SENT SCREEN ── */
     .td-sent-screen { display: none; }
     .td-sent-screen.show { display: block; }
-    .td-main-content.hidden { display: none; }
     .td-sent-inner { max-width: 560px; margin: 60px auto; padding: 0 24px 80px; text-align: center; }
     .sent-icon { font-size: 88px; display: block; margin-bottom: 20px; animation: ring .6s ease infinite alternate; }
-    @keyframes ring { from{transform:rotate(-8deg)}to{transform:rotate(8deg)} }
+    @keyframes ring { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
     .sent-title { font-size: 28px; font-weight: 900; margin-bottom: 12px; }
     .sent-sub { font-size: 17px; color: #666; line-height: 1.75; margin-bottom: 28px; }
-    .sent-details {
+    .sent-summary {
       background: #fff; border: 1px solid #e0e0e0; border-radius: 14px;
       padding: 20px 24px; margin-bottom: 24px; text-align: left;
       box-shadow: 0 2px 8px rgba(0,0,0,.05);
     }
-    .sent-details-title { font-size: 14px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
-    .sent-detail-row { display: flex; justify-content: space-between; font-size: 15px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
-    .sent-detail-row:last-child { border-bottom: none; }
-    .sent-detail-row span:first-child { color: #666; }
-    .sent-detail-row span:last-child { font-weight: 700; }
+    .sent-summary-title { font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
+    .sent-row { display: flex; justify-content: space-between; font-size: 15px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+    .sent-row:last-child { border-bottom: none; }
+    .sent-row span:first-child { color: #666; }
+    .sent-row span:last-child { font-weight: 700; }
     .sent-badge { display: inline-flex; align-items: center; gap: 10px; background: var(--td-green-pale); color: var(--td-green-d); border-radius: 24px; padding: 12px 24px; font-size: 15px; font-weight: 700; }
 
     /* ── FOOTER ── */
@@ -217,26 +168,21 @@
       </div>
       <div class="td-step">
         <div class="td-step-circle">3</div>
-        <span class="td-step-label">Your Quote</span>
-      </div>
-      <div class="td-step">
-        <div class="td-step-circle">4</div>
-        <span class="td-step-label">Finalize</span>
+        <span class="td-step-label">Get Your Quote</span>
       </div>
     </div>
   </div>
 
-  <!-- MAIN CONTENT (hidden when sent screen shows) -->
-  <div class="td-main td-main-content" id="main-content">
+  <!-- MAIN CONTENT -->
+  <div class="td-main">
+    <div class="td-main-content" id="main-content">
 
-    <!-- LEFT COLUMN -->
-    <div>
       <!-- Scan success banner -->
       <div class="scan-banner">
         <div class="scan-banner-icon">🔍</div>
         <div>
           <div class="scan-banner-title">Policy scanned successfully!</div>
-          <div class="scan-banner-sub">We extracted the following details from your document. Review them below — you can edit any field before requesting your quote.</div>
+          <div class="scan-banner-sub">We extracted the following details from your document. Review everything below and correct anything that doesn't look right.</div>
           <div class="scan-badge">📄 Aviva Canada · Policy #AV-2021-881943</div>
         </div>
       </div>
@@ -244,7 +190,7 @@
       <!-- Notice -->
       <div class="notice-banner">
         <div class="notice-icon">ℹ️</div>
-        <div>Some details (winter tires, annual mileage, usage type) weren't on your document — our advisor will confirm those with you on the call to finalize your quote.</div>
+        <div>A few details weren't available on your document — such as annual mileage, winter tire usage, and vehicle use type. A TD advisor will confirm these with you on the call to complete your quote.</div>
       </div>
 
       <!-- Personal Information -->
@@ -274,12 +220,12 @@
           <span class="data-val">12 years</span>
         </div>
         <div class="data-row">
-          <span class="data-key">Contact</span>
+          <span class="data-key">Preferred Contact</span>
           <span class="data-val" id="val-contact">416-555-0101 (SMS)</span>
         </div>
       </div>
 
-      <!-- Vehicle -->
+      <!-- Vehicle Information -->
       <div class="data-card">
         <div class="data-card-header">
           🚗 Vehicle Information
@@ -287,15 +233,15 @@
         </div>
         <div class="data-row">
           <span class="data-key">Year / Make / Model</span>
-          <span class="data-val highlight" id="val-vehicle">2021 Honda Civic LX</span>
+          <span class="data-val green" id="val-vehicle">2021 Honda Civic LX</span>
         </div>
         <div class="data-row">
           <span class="data-key">VIN</span>
-          <span class="data-val" id="val-vin">
-            <div class="confidence-bar-wrap">
+          <span class="data-val">
+            <div class="vin-wrap">
               2HGFE2F59MH502841
-              <div class="confidence-bar"><div class="confidence-fill" style="width:97%"></div></div>
-              <span class="confidence-label">97%</span>
+              <div class="conf-bar"><div class="conf-fill" style="width:97%"></div></div>
+              <span class="conf-label">97%</span>
             </div>
           </span>
         </div>
@@ -304,12 +250,8 @@
           <span class="data-val">4-Door Sedan</span>
         </div>
         <div class="data-row">
-          <span class="data-key">Use of Vehicle</span>
-          <span class="data-val">Pleasure / Commute</span>
-        </div>
-        <div class="data-row">
           <span class="data-key">Annual KM</span>
-          <span class="data-val warn">⚠ Not on document — advisor will confirm</span>
+          <span class="data-val warn">⚠ Not found — advisor will confirm</span>
         </div>
       </div>
 
@@ -331,7 +273,7 @@
         </div>
         <div class="data-row">
           <span class="data-key">Third Party Liability</span>
-          <span class="data-val highlight">$2,000,000</span>
+          <span class="data-val green">$2,000,000</span>
         </div>
         <div class="data-row">
           <span class="data-key">Collision Deductible</span>
@@ -351,7 +293,7 @@
         </div>
         <div class="data-row">
           <span class="data-key">Current Annual Premium</span>
-          <span class="data-val" style="color:#e53e3e;font-weight:900;">$2,284 / year</span>
+          <span class="data-val">$2,284 / year</span>
         </div>
         <div class="data-row">
           <span class="data-key">Policy Effective</span>
@@ -363,95 +305,67 @@
         </div>
       </div>
 
-      <!-- Driving History -->
-      <div class="data-card">
-        <div class="data-card-header">📋 Driving History (from policy)</div>
-        <div class="data-row"><span class="data-key">At-Fault Claims (5 yrs)</span><span class="data-val highlight">None</span></div>
-        <div class="data-row"><span class="data-key">Not-At-Fault Claims (5 yrs)</span><span class="data-val highlight">None</span></div>
-        <div class="data-row"><span class="data-key">Convictions (3 yrs)</span><span class="data-val highlight">None</span></div>
-        <div class="data-row"><span class="data-key">Discount Applied</span><span class="data-val"><span class="coverage-tag">Claims-Free Discount</span></span></div>
+      <!-- Action buttons -->
+      <div class="action-block">
+        <div class="action-label">Does everything look correct? If so, a TD Insurance advisor will call you to complete your quote — no forms, no waiting on hold.</div>
+        <button class="btn-get-quote" onclick="submitQuote()">
+          ✅ Yes — Ready to Get My TD Quote
+        </button>
+        <button class="btn-secondary" onclick="window.history.back()">
+          ← Edit My Document
+        </button>
+        <div class="fine-print">
+          A TD advisor will call you at <a href="#" id="contact-link">416-555-0101</a> shortly to finalize your quote.<br>No obligation. TD Insurance is a trade name of TD Home and Auto Insurance Company.
+        </div>
       </div>
 
-    </div><!-- /left col -->
+    </div><!-- /main-content -->
 
-    <!-- RIGHT: QUOTE SIDEBAR -->
-    <div class="quote-sidebar">
-      <div class="quote-card">
-        <div class="quote-card-header">🍁 Your TD Easy Switch Quote</div>
-        <div class="quote-preview">
-          <div class="quote-label">Estimated monthly premium</div>
-          <div class="quote-amount">$148</div>
-          <div class="quote-period">per month</div>
-          <div class="quote-annual">$1,776 / year — save <strong style="color:var(--td-green);">$508</strong></div>
+    <!-- SENT SCREEN -->
+    <div class="td-sent-screen" id="sent-screen">
+      <div class="td-sent-inner">
+        <span class="sent-icon">📞</span>
+        <div class="sent-title">You're all set!</div>
+        <div class="sent-sub">A TD Insurance advisor will be calling you shortly to walk through your personalized quote. They already have your policy details — so the call will be quick.</div>
+        <div class="sent-summary">
+          <div class="sent-summary-title">What we're passing to your advisor</div>
+          <div class="sent-row"><span>Name</span><span id="sent-name">Sarah Johnson</span></div>
+          <div class="sent-row"><span>Vehicle</span><span>2021 Honda Civic LX</span></div>
+          <div class="sent-row"><span>Current Coverage</span><span>Comprehensive + Collision</span></div>
+          <div class="sent-row"><span>Current Insurer</span><span>Aviva Canada</span></div>
+          <div class="sent-row"><span>Calling you at</span><span id="sent-contact">416-555-0101</span></div>
         </div>
-        <div class="quote-breakdown">
-          <div class="quote-breakdown-title">Coverage included</div>
-          <div class="quote-breakdown-row"><span>Third Party Liability</span><span>$2,000,000</span></div>
-          <div class="quote-breakdown-row"><span>Collision</span><span>$500 deductible</span></div>
-          <div class="quote-breakdown-row"><span>Comprehensive</span><span>$1,000 deductible</span></div>
-          <div class="quote-breakdown-row"><span>Accident Benefits</span><span>Standard SABS</span></div>
-          <div class="quote-breakdown-row"><span>Uninsured Motorist</span><span>Included</span></div>
-        </div>
-        <div class="quote-savings">🎉 Estimated annual savings: <strong>$508</strong> vs. your current Aviva policy</div>
-        <div class="quote-cta-section">
-          <div class="quote-cta-label">Ready to switch? Confirm your details and a TD advisor will call you to finalize.</div>
-          <button class="btn-get-quote" onclick="submitQuote()">
-            ✅ Yes — Get My TD Quote
-          </button>
-          <button class="btn-secondary" onclick="window.history.back()">
-            ← Edit My Document
-          </button>
-          <div class="advisor-note">
-            A TD advisor will call you at <a href="#">416-555-0101</a> within 5 minutes to finalize your quote. No obligation.
-          </div>
+        <div class="sent-badge">
+          <span style="background:var(--td-green);color:#fff;border-radius:8px;padding:3px 14px;font-size:13px;font-weight:900;">TD</span>
+          Secure · No obligation · Advisor calling now
         </div>
       </div>
     </div>
 
   </div><!-- /td-main -->
 
-  <!-- SENT SCREEN -->
-  <div class="td-sent-screen" id="sent-screen">
-    <div class="td-sent-inner">
-      <span class="sent-icon">📞</span>
-      <div class="sent-title">You're all set — your advisor is calling!</div>
-      <div class="sent-sub">A TD Insurance advisor is being connected to you right now. Your quote details are ready and waiting.</div>
-      <div class="sent-details">
-        <div class="sent-details-title">Your quote summary</div>
-        <div class="sent-detail-row"><span>Vehicle</span><span>2021 Honda Civic LX</span></div>
-        <div class="sent-detail-row"><span>Coverage</span><span>Comprehensive + Collision</span></div>
-        <div class="sent-detail-row"><span>TD Monthly Premium</span><span style="color:var(--td-green);">$148 / month</span></div>
-        <div class="sent-detail-row"><span>Annual Savings</span><span style="color:var(--td-green);">$508 vs. Aviva</span></div>
-        <div class="sent-detail-row"><span>Calling</span><span id="sent-contact">416-555-0101</span></div>
-      </div>
-      <div class="sent-badge">
-        <span style="background:var(--td-green);color:#fff;border-radius:8px;padding:3px 14px;font-size:13px;font-weight:900;">TD</span>
-        Secure · No obligation · Advisor calling now
-      </div>
-    </div>
-  </div>
-
   <div class="td-footer">
     © TD Insurance · <a href="#">Privacy Policy</a> · <a href="#">Terms of Use</a> · <a href="#">Accessibility</a> · 1-866-361-2311<br>
-    TD Insurance is a trade name of TD Home and Auto Insurance Company. Quote is an estimate — final premium confirmed by advisor.
+    TD Insurance is a trade name of TD Home and Auto Insurance Company.
   </div>
 
   <script>
   "use strict";
 
-  // Pre-fill name from URL param if passed from landing page: ?name=Sarah+Johnson&contact=416-555-0101
-  (function() {
+  // Pre-fill from URL params passed by landing page: ?name=Sarah+Johnson&contact=416-555-0101
+  (function () {
     const p = new URLSearchParams(window.location.search);
-    if (p.get('name'))    { document.getElementById('val-name').textContent = p.get('name'); }
-    if (p.get('contact')) {
-      document.getElementById('val-contact').textContent = p.get('contact');
-      document.getElementById('sent-contact').textContent = p.get('contact');
-    }
+    const name    = p.get('name')    || 'Sarah Johnson';
+    const contact = p.get('contact') || '416-555-0101 (SMS)';
+    document.getElementById('val-name').textContent     = name;
+    document.getElementById('val-contact').textContent  = contact;
+    document.getElementById('contact-link').textContent = contact.split(' ')[0];
+    document.getElementById('sent-name').textContent    = name;
+    document.getElementById('sent-contact').textContent = contact.split(' ')[0];
   })();
 
   function toggleEdit(section) {
-    // For demo purposes just flash a brief "edit mode" indicator
-    alert('In the live version, this would let you correct any mis-scanned field before submitting.');
+    alert('In the live version this lets you correct any mis-scanned field before submitting.');
   }
 
   function submitQuote() {
