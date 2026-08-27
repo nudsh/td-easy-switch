@@ -763,12 +763,14 @@
 
   function tdConfirmScreen(viewId, fname, lname) {
     return `
-    <div class="td-confirm-section">
-      <div class="confirm-hero">
-        <span class="confirm-icon">✅</span>
-        <div class="confirm-title">Policy Scanned Successfully!</div>
-        <div class="confirm-sub">Here's what we found. Please confirm the details are correct before we generate your TD quote.</div>
+    <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:20px 24px;display:flex;align-items:center;gap:14px;color:#fff;">
+      <span style="font-size:32px;flex-shrink:0;">✅</span>
+      <div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:2px;">We've got you covered</div>
+        <div style="font-size:13px;opacity:.88;">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
       </div>
+    </div>
+    <div class="td-confirm-section">
       <div class="data-card">
         <div class="data-card-header">👤 Personal Information</div>
         <div class="data-row"><span class="data-key">Name</span><span class="data-val">${fname} ${lname}</span></div>
@@ -787,10 +789,10 @@
         <div class="data-row"><span class="data-key">Deductible</span><span class="data-val">$500 / $1,000</span></div>
         <div class="data-row"><span class="data-key">Policy Expires</span><span class="data-val">March 15, 2026</span></div>
       </div>
-      <div class="confirm-question">Would you like a TD quote based on this information?</div>
+      <div class="confirm-question">Does everything look correct?</div>
       <div class="confirm-btns">
-        <button class="btn-no" onclick="navTo('${viewId}','td')">No thanks</button>
-        <button class="btn-yes" onclick="showSent('${viewId}')">✅ Yes, get my TD quote</button>
+        <button class="btn-no" onclick="navTo('${viewId}','td')">← Edit</button>
+        <button class="btn-yes" onclick="showSent('${viewId}')">✅ Yes — Get My TD Quote</button>
       </div>
     </div>`;
   }
