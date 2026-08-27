@@ -197,11 +197,22 @@
     }
     .covered-banner.show { display: block; }
     .covered-banner-title {
-      font-size: 42px; font-weight: 900; margin-bottom: 14px; line-height: 1.1;
+      font-size: 42px; font-weight: 900; line-height: 1.1;
     }
     .covered-banner-sub {
       font-size: 17px; opacity: .9; line-height: 1.6; max-width: 480px; margin: 0 auto;
+      display: none; /* sub-text now lives in the white strip below, not in the banner */
     }
+    .covered-strip {
+      display: none;
+      background: #fff;
+      padding: 16px 28px;
+      border-bottom: 1px solid #e0e0e0;
+      align-items: center;
+      gap: 12px;
+    }
+    .covered-strip.show { display: flex; }
+    .covered-strip-text { font-size: 15px; color: #1a1a1a; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -241,6 +252,10 @@
   <div class="covered-banner" id="covered-banner">
     <div class="covered-banner-title">We've Got You Covered!</div>
     <div class="covered-banner-sub" id="covered-banner-sub">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
+  </div>
+  <div class="covered-strip" id="covered-strip">
+    <span style="font-size:22px;flex-shrink:0;">✅</span>
+    <div class="covered-strip-text" id="covered-strip-text"></div>
   </div>
 
   <!-- MAIN -->
@@ -471,11 +486,14 @@
     hero.style.display    = onUpload ? '' : 'none';
     covered.classList.toggle('show', !onUpload);
 
-    // Tailor the sub-text per screen
+    // White strip below banner — shows context message in black text with checkmark
+    const strip     = document.getElementById('covered-strip');
+    const stripText = document.getElementById('covered-strip-text');
+    strip.classList.toggle('show', !onUpload);
     if (id === 'screen-confirm') {
-      sub.textContent = 'Policy scanned — confirm your details below and we\'ll get your TD quote started.';
+      stripText.textContent = 'Policy scanned — confirm your details below and we\'ll get your TD quote started.';
     } else if (id === 'screen-sent-v1' || id === 'screen-sent-v2') {
-      sub.textContent = 'Policy scanned — a TD advisor will contact you shortly.';
+      stripText.textContent = 'Policy scanned — a TD advisor will contact you shortly.';
     }
   }
 
