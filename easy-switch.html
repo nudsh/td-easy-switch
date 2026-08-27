@@ -767,8 +767,8 @@
       <div style="font-size:38px;font-weight:900;line-height:1.1;">We've Got You Covered!</div>
     </div>
     <div class="td-confirm-section">
-      <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;margin-bottom:20px;">
-        <span style="font-size:20px;flex-shrink:0;margin-top:1px;">✅</span>
+      <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;margin-bottom:20px;justify-content:center;text-align:center;">
+        <span style="font-size:20px;flex-shrink:0;">✅</span>
         <div style="font-size:14px;color:#1a1a1a;line-height:1.55;">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
       </div>
       <div class="data-card">
@@ -799,18 +799,9 @@
 
   function tdSentScreen(vid) {
     const v = vState[vid] || { ver: 1, time: 'afternoon' };
-    const bannerSub = v.ver === 2
-      ? 'Policy scanned — a TD advisor will contact you shortly.'
-      : 'Policy scanned — a TD advisor will contact you shortly.';
     const banner = `
     <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:44px 28px 38px;text-align:center;color:#fff;">
       <div style="font-size:38px;font-weight:900;line-height:1.1;">We've Got You Covered!</div>
-    </div>
-    <div style="max-width:680px;margin:24px auto 0;padding:0 20px;">
-      <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;">
-        <span style="font-size:20px;flex-shrink:0;margin-top:1px;">✅</span>
-        <div style="font-size:14px;color:#1a1a1a;line-height:1.55;">${bannerSub}</div>
-      </div>
     </div>`;
     if (v.ver === 2) {
       return banner + `
