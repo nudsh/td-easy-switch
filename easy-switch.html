@@ -894,7 +894,7 @@
   // Desktop: open TD landing in a new tab. Mobile: navigate inside phone frame.
   function clickAd(view) {
     if (view === 'desktop') {
-      window.open('td-landing.html', '_blank');
+      window.open('td-landing.html?v=' + (vState['desktop'].ver || 1), '_blank');
     } else {
       navTo('mobile', 'td');
     }

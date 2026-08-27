@@ -410,7 +410,7 @@
   <script>
   "use strict";
 
-  let currentVersion = 1;
+  let currentVersion = parseInt(new URLSearchParams(window.location.search).get('v')) || 1;
   let selectedTime   = 'afternoon';
 
   const TIME_LABELS = {
@@ -418,6 +418,14 @@
     afternoon: 'This afternoon (12 pm – 5 pm)',
     evening:   'This evening (5 pm – 8 pm)'
   };
+
+  // Apply version state on load
+  window.addEventListener('DOMContentLoaded', () => {
+    setVersion(currentVersion);
+    // Ensure submit button reflects current version on load (it's disabled but label should match)
+    const btn = document.getElementById('submit-btn');
+    if (btn) btn.textContent = currentVersion === 1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
+  });
 
   /* ── VERSION TOGGLE ── */
   function setVersion(v) {
