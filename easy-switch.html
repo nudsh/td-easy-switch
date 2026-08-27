@@ -763,12 +763,9 @@
 
   function tdConfirmScreen(viewId, fname, lname) {
     return `
-    <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:20px 24px;display:flex;align-items:center;gap:14px;color:#fff;">
-      <span style="font-size:32px;flex-shrink:0;">✅</span>
-      <div>
-        <div style="font-size:18px;font-weight:900;margin-bottom:2px;">We've got you covered</div>
-        <div style="font-size:13px;opacity:.88;">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
-      </div>
+    <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:44px 28px 38px;text-align:center;color:#fff;">
+      <div style="font-size:38px;font-weight:900;margin-bottom:12px;line-height:1.1;">We've Got You Covered!</div>
+      <div style="font-size:15px;opacity:.9;line-height:1.6;max-width:420px;margin:0 auto;">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
     </div>
     <div class="td-confirm-section">
       <div class="data-card">
@@ -799,8 +796,16 @@
 
   function tdSentScreen(vid) {
     const v = vState[vid] || { ver: 1, time: 'afternoon' };
+    const bannerSub = v.ver === 2
+      ? 'Policy scanned — a TD advisor will contact you shortly.'
+      : 'Policy scanned — a TD advisor will contact you shortly.';
+    const banner = `
+    <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:44px 28px 38px;text-align:center;color:#fff;">
+      <div style="font-size:38px;font-weight:900;margin-bottom:12px;line-height:1.1;">We've Got You Covered!</div>
+      <div style="font-size:15px;opacity:.9;line-height:1.6;max-width:420px;margin:0 auto;">${bannerSub}</div>
+    </div>`;
     if (v.ver === 2) {
-      return `
+      return banner + `
       <div class="td-upload-section" style="text-align:center;padding-top:40px;">
         <span style="font-size:80px;display:block;margin-bottom:16px;">✉️</span>
         <div style="font-size:24px;font-weight:900;color:#1a1a1a;margin-bottom:10px;">Thanks — we've got your document!</div>
@@ -815,7 +820,7 @@
         </div>
       </div>`;
     }
-    return `
+    return banner + `
       <div class="td-upload-section" style="text-align:center;padding-top:40px;">
         <span style="font-size:80px;display:block;margin-bottom:16px;animation:ring .6s ease infinite alternate;">📞</span>
         <div style="font-size:24px;font-weight:900;color:#1a1a1a;margin-bottom:10px;">Your quote is on its way!</div>

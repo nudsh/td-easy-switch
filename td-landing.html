@@ -186,6 +186,22 @@
     /* ── FOOTER ── */
     .td-footer { background:#1a1a1a; color:#888; text-align:center; padding:24px; font-size:13px; line-height:1.7; }
     .td-footer a { color:#aaa; text-decoration:underline; }
+
+    /* ── COVERED BANNER (replaces hero on confirm/sent screens) ── */
+    .covered-banner {
+      display: none;
+      background: linear-gradient(135deg, #00A651 0%, #007A3C 100%);
+      padding: 48px 32px 40px;
+      text-align: center;
+      color: #fff;
+    }
+    .covered-banner.show { display: block; }
+    .covered-banner-title {
+      font-size: 42px; font-weight: 900; margin-bottom: 14px; line-height: 1.1;
+    }
+    .covered-banner-sub {
+      font-size: 17px; opacity: .9; line-height: 1.6; max-width: 480px; margin: 0 auto;
+    }
   </style>
 </head>
 <body>
@@ -206,17 +222,10 @@
   <div class="td-crumb">
     <a href="javascript:window.close()">← Back to Facebook</a>
     <span>›</span><span>Easy Switch</span>
-    <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;">Demo</span>
-      <div style="display:flex;background:#e5e7eb;border-radius:999px;padding:3px;gap:2px;">
-        <button id="lp-vbtn1" onclick="setVersion(1)" style="padding:4px 14px;border-radius:999px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:#fff;color:#00A651;box-shadow:0 1px 4px rgba(0,0,0,.15);">V1</button>
-        <button id="lp-vbtn2" onclick="setVersion(2)" style="padding:4px 14px;border-radius:999px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#6b7280;">V2</button>
-      </div>
-    </span>
   </div>
 
   <!-- HERO -->
-  <div class="td-hero">
+  <div class="td-hero" id="td-hero">
     <div class="td-hero-eyebrow">🍁 TD Easy Switch — Exclusive Offer</div>
     <div class="td-hero-headline">Your quote is already<br>in your hands. Just upload it.</div>
     <div class="td-hero-sub">Skip the long form. Upload your current insurance policy document — our AI reads it instantly and a TD advisor calls you with your personalized quote.</div>
@@ -226,6 +235,12 @@
       <div class="td-hero-step"><div class="td-hero-step-icon">📋</div><div class="td-hero-step-label">Confirm your<br>details</div></div>
       <div class="td-hero-step"><div class="td-hero-step-icon">📞</div><div class="td-hero-step-label">Advisor<br>calls you</div></div>
     </div>
+  </div>
+
+  <!-- COVERED BANNER — shown instead of hero after upload -->
+  <div class="covered-banner" id="covered-banner">
+    <div class="covered-banner-title">We've Got You Covered!</div>
+    <div class="covered-banner-sub" id="covered-banner-sub">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
   </div>
 
   <!-- MAIN -->
@@ -309,13 +324,6 @@
 
     <!-- ══ SCREEN 2 (V1): Extracted data confirmation ══ -->
     <div class="td-screen" id="screen-confirm">
-      <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:20px 28px;display:flex;align-items:center;gap:16px;color:#fff;">
-        <span style="font-size:36px;flex-shrink:0;">✅</span>
-        <div>
-          <div style="font-size:20px;font-weight:900;margin-bottom:3px;">We've got you covered</div>
-          <div style="font-size:14px;opacity:.88;">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
-        </div>
-      </div>
       <div class="data-card">
         <div class="data-card-header">👤 Personal Information</div>
         <div class="data-row"><span class="data-key">Name</span><span class="data-val" id="ex-name">—</span></div>
@@ -453,6 +461,22 @@
     document.querySelectorAll('.td-screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Swap hero banner ↔ covered banner
+    const hero    = document.getElementById('td-hero');
+    const covered = document.getElementById('covered-banner');
+    const sub     = document.getElementById('covered-banner-sub');
+    const onUpload = (id === 'screen-upload');
+
+    hero.style.display    = onUpload ? '' : 'none';
+    covered.classList.toggle('show', !onUpload);
+
+    // Tailor the sub-text per screen
+    if (id === 'screen-confirm') {
+      sub.textContent = 'Policy scanned — confirm your details below and we\'ll get your TD quote started.';
+    } else if (id === 'screen-sent-v1' || id === 'screen-sent-v2') {
+      sub.textContent = 'Policy scanned — a TD advisor will contact you shortly.';
+    }
   }
 
   /* ── DRAG & DROP ── */
