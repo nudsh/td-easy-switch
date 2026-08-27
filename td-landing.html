@@ -427,7 +427,7 @@
     if (b1) { b1.style.background = v===1?'#fff':'transparent'; b1.style.color = v===1?'#00A651':'#6b7280'; b1.style.boxShadow = v===1?'0 1px 4px rgba(0,0,0,.15)':'none'; }
     if (b2) { b2.style.background = v===2?'#fff':'transparent'; b2.style.color = v===2?'#6366f1':'#6b7280'; b2.style.boxShadow = v===2?'0 1px 4px rgba(0,0,0,.15)':'none'; }
     const btn = document.getElementById('submit-btn');
-    if (btn && !btn.disabled) btn.textContent = v===1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+    if (btn && !btn.disabled) btn.textContent = v===1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
   }
 
   /* ── CALL TIME (always shown) ── */
@@ -448,7 +448,7 @@
     document.getElementById('file-preview').classList.add('show');
     const btn = document.getElementById('submit-btn');
     btn.disabled = false;
-    btn.textContent = currentVersion === 1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+    btn.textContent = currentVersion === 1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
   }
   function removeFile() {
     document.getElementById('file-preview').classList.remove('show');
@@ -462,14 +462,14 @@
     const lname = document.getElementById('lname').value.trim() || 'Smith';
     const btn   = document.getElementById('submit-btn');
 
-    if (currentVersion === 2) {
-      // V2: skip scan, go straight to thank-you
+    if (currentVersion === 1) {
+      // V1: Drop & Go — skip scan, go straight to thank-you
       btn.textContent = '⏳ Uploading...';
       btn.disabled = true;
       document.getElementById('sent-time-display').textContent = TIME_LABELS[selectedTime];
       setTimeout(() => showScreen('screen-sent-v2'), 1200);
     } else {
-      // V1: simulate scan then show extracted data
+      // V2: Wait & Review — simulate scan then show extracted data
       btn.textContent = '⏳ Scanning document...';
       btn.disabled = true;
       setTimeout(() => {

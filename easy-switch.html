@@ -914,9 +914,9 @@
         // Apply current version state to the freshly rendered screen
         const sv = vState['mobile'];
         const sb = document.getElementById('sub-mobile');
-        if (sb) sb.textContent = sv.ver === 1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+        if (sb) sb.textContent = sv.ver === 1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
         const ct = document.getElementById('calltime-mobile');
-        if (ct) ct.style.display = sv.ver === 2 ? 'block' : 'none';
+        if (ct) ct.style.display = sv.ver === 1 ? 'block' : 'none';
         // Scroll the screen div to top AFTER it is visible
         requestAnimationFrame(() => { td.scrollTop = 0; });
       } else {
@@ -937,9 +937,9 @@
         // Apply current version state to the freshly rendered screen
         const dv = vState['desktop'];
         const db = document.getElementById('sub-desktop');
-        if (db) db.textContent = dv.ver === 1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+        if (db) db.textContent = dv.ver === 1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
         const dc = document.getElementById('calltime-desktop');
-        if (dc) dc.style.display = dv.ver === 2 ? 'block' : 'none';
+        if (dc) dc.style.display = dv.ver === 1 ? 'block' : 'none';
         window.scrollTo({ top: 0, behavior: 'instant' });
         document.getElementById('desktop-stage').scrollTop = 0;
       } else {
@@ -992,10 +992,12 @@
     const btn = document.getElementById('sub-'+vid);
     const ver = (vState[vid] || {}).ver || 1;
 
-    if (ver === 2) {
+    if (ver === 1) {
+      // V1: Drop & Go — skip scan, go straight to thank-you
       btn.textContent = '⏳ Uploading...'; btn.disabled = true;
       setTimeout(() => showSent(vid), 1200);
     } else {
+      // V2: Wait & Review — scan then show confirm screen
       btn.textContent = '⏳ Scanning document...'; btn.disabled = true;
       setTimeout(() => {
         const container = vid === 'mobile'
@@ -1028,11 +1030,11 @@
     if (b1) { b1.style.background = v===1?'#fff':'transparent'; b1.style.color = v===1?'#00A651':'#6b7280'; b1.style.boxShadow = v===1?'0 1px 5px rgba(0,0,0,.12)':'none'; }
     if (b2) { b2.style.background = v===2?'#fff':'transparent'; b2.style.color = v===2?'#6366f1':'#6b7280'; b2.style.boxShadow = v===2?'0 1px 5px rgba(0,0,0,.12)':'none'; }
     const desc = document.getElementById('ver-desc-'+vid);
-    if (desc) desc.textContent = v===1 ? 'V1 · Wait & Review — scan results shown immediately' : 'V2 · Drop & Go — submit and we\'ll call you at your preferred time';
+    if (desc) desc.textContent = v===1 ? 'V1 · Drop & Go — upload and we\'ll call you at your preferred time' : 'V2 · Wait & Review — scan results shown immediately';
     const ct = document.getElementById('calltime-'+vid);
-    if (ct) ct.style.display = v===2 ? 'block' : 'none';
+    if (ct) ct.style.display = v===1 ? 'block' : 'none';
     const btn = document.getElementById('sub-'+vid);
-    if (btn && !btn.disabled) btn.textContent = v===1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+    if (btn && !btn.disabled) btn.textContent = v===1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
   }
 
   // Global toggle from the floating pill — applies to whichever view is active
@@ -1048,7 +1050,7 @@
     ['mobile','desktop'].forEach(vid => {
       vState[vid].ver = v;
       const btn = document.getElementById('sub-'+vid);
-      if (btn && !btn.disabled) btn.textContent = v===1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+      if (btn && !btn.disabled) btn.textContent = v===1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
     });
   }
 
