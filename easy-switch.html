@@ -766,13 +766,11 @@
     <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:44px 28px 38px;text-align:center;color:#fff;">
       <div style="font-size:38px;font-weight:900;line-height:1.1;">We've Got You Covered!</div>
     </div>
-    <div style="background:#fff;padding:16px 0;border-bottom:1px solid #e0e0e0;">
-      <div style="max-width:680px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;">
-        <span style="font-size:22px;flex-shrink:0;">✅</span>
-        <div style="font-size:14px;color:#1a1a1a;line-height:1.5;">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
-      </div>
-    </div>
     <div class="td-confirm-section">
+      <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;margin-bottom:20px;">
+        <span style="font-size:20px;flex-shrink:0;margin-top:1px;">✅</span>
+        <div style="font-size:14px;color:#1a1a1a;line-height:1.55;">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
+      </div>
       <div class="data-card">
         <div class="data-card-header">👤 Personal Information</div>
         <div class="data-row"><span class="data-key">Name</span><span class="data-val">${fname} ${lname}</span></div>
@@ -808,10 +806,10 @@
     <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:44px 28px 38px;text-align:center;color:#fff;">
       <div style="font-size:38px;font-weight:900;line-height:1.1;">We've Got You Covered!</div>
     </div>
-    <div style="background:#fff;padding:16px 0;border-bottom:1px solid #e0e0e0;">
-      <div style="max-width:680px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;">
-        <span style="font-size:22px;flex-shrink:0;">✅</span>
-        <div style="font-size:14px;color:#1a1a1a;line-height:1.5;">${bannerSub}</div>
+    <div style="max-width:680px;margin:24px auto 0;padding:0 20px;">
+      <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;">
+        <span style="font-size:20px;flex-shrink:0;margin-top:1px;">✅</span>
+        <div style="font-size:14px;color:#1a1a1a;line-height:1.55;">${bannerSub}</div>
       </div>
     </div>`;
     if (v.ver === 2) {
@@ -922,6 +920,12 @@
         bar.classList.add('td-bar');
         document.getElementById('td-mobile-content').innerHTML = tdUploadScreen('mobile');
         wireDropZone('mobile');
+        // Apply current version state to the freshly rendered screen
+        const sv = vState['mobile'];
+        const sb = document.getElementById('sub-mobile');
+        if (sb) sb.textContent = sv.ver === 1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+        const ct = document.getElementById('calltime-mobile');
+        if (ct) ct.style.display = sv.ver === 2 ? 'block' : 'none';
         // Scroll the screen div to top AFTER it is visible
         requestAnimationFrame(() => { td.scrollTop = 0; });
       } else {
@@ -939,6 +943,12 @@
         urlText.textContent = 'tdinsurance.com/easy-switch';
         document.getElementById('td-desktop-content').innerHTML = tdUploadScreen('desktop');
         wireDropZone('desktop');
+        // Apply current version state to the freshly rendered screen
+        const dv = vState['desktop'];
+        const db = document.getElementById('sub-desktop');
+        if (db) db.textContent = dv.ver === 1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+        const dc = document.getElementById('calltime-desktop');
+        if (dc) dc.style.display = dv.ver === 2 ? 'block' : 'none';
         window.scrollTo({ top: 0, behavior: 'instant' });
         document.getElementById('desktop-stage').scrollTop = 0;
       } else {

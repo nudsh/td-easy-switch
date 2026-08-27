@@ -343,6 +343,10 @@
 
     <!-- ══ SCREEN 2 (V1): Extracted data confirmation ══ -->
     <div class="td-screen" id="screen-confirm">
+      <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;margin-bottom:20px;">
+        <span style="font-size:20px;flex-shrink:0;margin-top:1px;">✅</span>
+        <div style="font-size:14px;color:#1a1a1a;line-height:1.55;" id="confirm-strip-text">Policy scanned — confirm your details below and we'll get your TD quote started.</div>
+      </div>
       <div class="data-card">
         <div class="data-card-header">👤 Personal Information</div>
         <div class="data-row"><span class="data-key">Name</span><span class="data-val" id="ex-name">—</span></div>
@@ -370,6 +374,10 @@
 
     <!-- ══ SCREEN 3a (V1): Advisor calling ══ -->
     <div class="td-screen" id="screen-sent-v1">
+      <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;margin-bottom:20px;">
+        <span style="font-size:20px;flex-shrink:0;margin-top:1px;">✅</span>
+        <div style="font-size:14px;color:#1a1a1a;line-height:1.55;" id="confirm-strip-text">Policy scanned — a TD advisor will contact you shortly.</div>
+      </div>
       <div class="td-sent">
         <span class="sent-icon">📞</span>
         <div class="sent-title">Your quote is on its way!</div>
@@ -383,6 +391,10 @@
 
     <!-- ══ SCREEN 3b (V2): Drop & Go thank you ══ -->
     <div class="td-screen" id="screen-sent-v2">
+      <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 16px;margin-bottom:20px;">
+        <span style="font-size:20px;flex-shrink:0;margin-top:1px;">✅</span>
+        <div style="font-size:14px;color:#1a1a1a;line-height:1.55;">Policy scanned — a TD advisor will contact you shortly.</div>
+      </div>
       <div class="td-sent">
         <span class="sent-icon">✉️</span>
         <div class="sent-title">Thanks — we've got your document!</div>
@@ -490,14 +502,14 @@
     hero.style.display    = onUpload ? '' : 'none';
     covered.classList.toggle('show', !onUpload);
 
-    // White strip below banner — shows context message in black text with checkmark
-    const strip     = document.getElementById('covered-strip');
-    const stripText = document.getElementById('covered-strip-text');
-    strip.classList.toggle('show', !onUpload);
-    if (id === 'screen-confirm') {
-      stripText.textContent = 'Policy scanned — confirm your details below and we\'ll get your TD quote started.';
-    } else if (id === 'screen-sent-v1' || id === 'screen-sent-v2') {
-      stripText.textContent = 'Policy scanned — a TD advisor will contact you shortly.';
+    // Update the ✅ notice card text inside confirm/sent screens
+    const stripText = document.getElementById('confirm-strip-text');
+    if (stripText) {
+      if (id === 'screen-confirm') {
+        stripText.textContent = 'Policy scanned — confirm your details below and we\'ll get your TD quote started.';
+      } else if (id === 'screen-sent-v1' || id === 'screen-sent-v2') {
+        stripText.textContent = 'Policy scanned — a TD advisor will contact you shortly.';
+      }
     }
   }
 
