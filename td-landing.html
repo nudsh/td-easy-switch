@@ -206,6 +206,13 @@
   <div class="td-crumb">
     <a href="javascript:window.close()">← Back to Facebook</a>
     <span>›</span><span>Easy Switch</span>
+    <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;">Demo</span>
+      <div style="display:flex;background:#e5e7eb;border-radius:999px;padding:3px;gap:2px;">
+        <button id="lp-vbtn1" onclick="setVersion(1)" style="padding:4px 14px;border-radius:999px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:#fff;color:#00A651;box-shadow:0 1px 4px rgba(0,0,0,.15);">V1</button>
+        <button id="lp-vbtn2" onclick="setVersion(2)" style="padding:4px 14px;border-radius:999px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#6b7280;">V2</button>
+      </div>
+    </span>
   </div>
 
   <!-- HERO -->
@@ -227,21 +234,6 @@
     <!-- ══ SCREEN 1: Upload form ══ -->
     <div class="td-screen active" id="screen-upload">
 
-      <!-- V1 / V2 Toggle -->
-      <div class="version-toggle-wrap">
-        <div>
-          <div class="version-toggle-label">Demo Experience</div>
-          <div class="version-desc" id="ver-desc">Wait & Review — scan results shown immediately</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span class="version-badge v1" id="ver-badge">V1</span>
-          <div class="version-toggle">
-            <button class="ver-btn v1 active" id="btn-v1" onclick="setVersion(1)">V1 — Wait &amp; Review</button>
-            <button class="ver-btn v2"         id="btn-v2" onclick="setVersion(2)">V2 — Drop &amp; Go</button>
-          </div>
-        </div>
-      </div>
-
       <div class="td-trust-bar">
         <div class="td-trust-item">🔒 Bank-level security</div>
         <div class="td-trust-item">🍁 Backed by TD Canada Trust</div>
@@ -250,24 +242,18 @@
       </div>
 
       <div class="td-section-title">Tell us who you are</div>
-      <div class="td-section-sub">Just your name and how you'd like us to reach you.</div>
+      <div class="td-section-sub">Just a few quick details so our advisor knows who to call.</div>
       <div class="td-fields">
         <div class="td-field"><label>First Name</label><input type="text" id="fname" placeholder="e.g. Sarah"/></div>
         <div class="td-field"><label>Last Name</label><input type="text" id="lname" placeholder="e.g. Johnson"/></div>
       </div>
-      <div class="td-fields" style="align-items:flex-end;">
-        <div class="td-field" style="flex:0 0 220px;">
-          <label>Preferred Contact</label>
-          <div class="pref-row">
-            <button class="pref-btn active" id="pref-sms" onclick="setPref('sms')">📱 SMS</button>
-            <button class="pref-btn" id="pref-email" onclick="setPref('email')">✉️ Email</button>
-          </div>
-        </div>
-        <div class="td-field"><label>Contact Details</label><input type="tel" id="contact-val" placeholder="Mobile number"/></div>
+      <div class="td-fields">
+        <div class="td-field"><label>Email Address</label><input type="email" id="contact-email" placeholder="e.g. sarah@email.com"/></div>
+        <div class="td-field"><label>Phone Number</label><input type="tel" id="contact-val" placeholder="e.g. 416-555-0101"/></div>
       </div>
 
-      <!-- V2 only: best time to call -->
-      <div class="call-time-section" id="call-time-section">
+      <!-- Call time picker — always visible -->
+      <div class="call-time-section show" id="call-time-section">
         <div class="call-time-label">Best time to call you</div>
         <div class="time-btns">
           <button class="time-btn" id="time-morning" onclick="setTime('morning')">
@@ -403,37 +389,20 @@
   /* ── VERSION TOGGLE ── */
   function setVersion(v) {
     currentVersion = v;
-    document.getElementById('btn-v1').classList.toggle('active', v === 1);
-    document.getElementById('btn-v2').classList.toggle('active', v === 2);
-    document.getElementById('ver-badge').className = 'version-badge ' + (v === 1 ? 'v1' : 'v2');
-    document.getElementById('ver-badge').textContent = 'V' + v;
-    document.getElementById('ver-desc').textContent = v === 1
-      ? 'Wait & Review — scan results shown immediately'
-      : 'Drop & Go — submit and we\'ll call you at your preferred time';
-    document.getElementById('call-time-section').classList.toggle('show', v === 2);
+    const b1 = document.getElementById('lp-vbtn1');
+    const b2 = document.getElementById('lp-vbtn2');
+    if (b1) { b1.style.background = v===1?'#fff':'transparent'; b1.style.color = v===1?'#00A651':'#6b7280'; b1.style.boxShadow = v===1?'0 1px 4px rgba(0,0,0,.15)':'none'; }
+    if (b2) { b2.style.background = v===2?'#fff':'transparent'; b2.style.color = v===2?'#6366f1':'#6b7280'; b2.style.boxShadow = v===2?'0 1px 4px rgba(0,0,0,.15)':'none'; }
     const btn = document.getElementById('submit-btn');
-    if (!btn.disabled) {   // only update text if not mid-scan
-      btn.textContent = v === 1
-        ? '🔍 Scan My Policy & Get a Quote'
-        : '📤 Submit My Document';
-    }
+    if (btn && !btn.disabled) btn.textContent = v===1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
   }
 
-  /* ── CALL TIME ── */
+  /* ── CALL TIME (always shown) ── */
   function setTime(t) {
     selectedTime = t;
     ['morning','afternoon','evening'].forEach(x =>
       document.getElementById('time-' + x).classList.toggle('active', x === t)
     );
-  }
-
-  /* ── CONTACT PREF ── */
-  function setPref(p) {
-    document.getElementById('pref-sms').classList.toggle('active', p === 'sms');
-    document.getElementById('pref-email').classList.toggle('active', p === 'email');
-    const inp = document.getElementById('contact-val');
-    if (p === 'sms') { inp.type = 'tel';   inp.placeholder = 'Mobile number'; }
-    else             { inp.type = 'email'; inp.placeholder = 'Email address'; }
   }
 
   /* ── FILE HANDLING ── */

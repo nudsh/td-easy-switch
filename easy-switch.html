@@ -457,6 +457,12 @@
       <div class="fc-track"></div>
       <div class="fc-knob">🌙</div>
     </label>
+    <div class="fc-sep"></div>
+    <span class="fc-label" id="fc-ver-label">V1</span>
+    <div style="display:flex;background:rgba(255,255,255,.12);border-radius:999px;padding:3px;gap:2px;">
+      <button id="fc-vbtn1" onclick="setGlobalVer(1)" style="padding:4px 11px;border-radius:999px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:#fff;color:#00A651;box-shadow:0 1px 4px rgba(0,0,0,.2);">V1</button>
+      <button id="fc-vbtn2" onclick="setGlobalVer(2)" style="padding:4px 11px;border-radius:999px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:transparent;color:#9ca3af;">V2</button>
+    </div>
   </div>
 
   <!-- ============================================================
@@ -694,59 +700,37 @@
     </div>
     <div class="td-upload-section">
 
-      <!-- V1/V2 toggle -->
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:24px;">
-        <div>
-          <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;">Demo Experience</div>
-          <div style="font-size:13px;color:#666;margin-top:3px;" id="ver-desc-${viewId}">V1 · Wait &amp; Review — scan results shown immediately</div>
-        </div>
-        <div style="display:flex;background:#e5e7eb;border-radius:999px;padding:4px;gap:2px;">
-          <button onclick="setVer('${viewId}',1)" id="vbtn1-${viewId}"
-            style="padding:6px 14px;border-radius:999px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:#fff;color:#00A651;box-shadow:0 1px 5px rgba(0,0,0,.12);">
-            V1 — Wait &amp; Review</button>
-          <button onclick="setVer('${viewId}',2)" id="vbtn2-${viewId}"
-            style="padding:6px 14px;border-radius:999px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:transparent;color:#6b7280;">
-            V2 — Drop &amp; Go</button>
-        </div>
-      </div>
-
       <div class="td-trust-bar">
         <div class="td-trust-item">🔒 Bank-level security</div>
         <div class="td-trust-item">🍁 TD Canada Trust</div>
         <div class="td-trust-item">⚡ Quick &amp; easy</div>
       </div>
       <div class="td-section-title">Tell us who you are</div>
-      <div class="td-section-sub">Just your name and how you'd like to be reached — that's it.</div>
+      <div class="td-section-sub">Just a few quick details so our advisor knows who to call.</div>
       <div class="td-fields">
         <div class="td-field"><label>First Name</label><input type="text" id="td-fname-${viewId}" placeholder="e.g. Sarah"/></div>
         <div class="td-field"><label>Last Name</label><input type="text" id="td-lname-${viewId}" placeholder="e.g. Johnson"/></div>
       </div>
-      <div class="td-fields" style="margin-bottom:8px;">
-        <div class="td-field" style="flex:0 0 auto;min-width:0;">
-          <label>Preferred Contact</label>
-          <div class="pref-row" style="margin-bottom:0;">
-            <button class="pref-btn active" id="pref-sms-${viewId}" onclick="setPref('${viewId}','sms')">📱 SMS</button>
-            <button class="pref-btn" id="pref-email-${viewId}" onclick="setPref('${viewId}','email')">✉️ Email</button>
-          </div>
-        </div>
-        <div class="td-field"><label>&nbsp;</label><input type="tel" id="td-contact-${viewId}" placeholder="Mobile number"/></div>
+      <div class="td-fields">
+        <div class="td-field"><label>Email Address</label><input type="email" id="td-email-${viewId}" placeholder="e.g. sarah@email.com"/></div>
+        <div class="td-field"><label>Phone Number</label><input type="tel" id="td-contact-${viewId}" placeholder="e.g. 416-555-0101"/></div>
       </div>
 
-      <!-- V2 only: best time to call -->
-      <div id="calltime-${viewId}" style="display:none;margin:16px 0;">
+      <!-- Call time picker — always visible, V2 pre-selects it, V1 still shows it -->
+      <div id="calltime-${viewId}" style="margin:20px 0 8px;">
         <div style="font-size:12px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Best time to call you</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="time-btn" id="time-morning-${viewId}" onclick="setTime('${viewId}','morning')"
+          <button id="time-morning-${viewId}" onclick="setTime('${viewId}','morning')"
             style="flex:1;min-width:100px;padding:12px 8px;border-radius:12px;border:1.5px solid #d1d5db;background:#fff;font-size:13px;font-weight:600;cursor:pointer;text-align:center;">
-            🌅<br><strong>Morning</strong><br><span style="font-size:11px;color:#888;">8 am–12 pm</span>
+            🌅<br><strong>Morning</strong><br><span style="font-size:11px;color:#888;">8 am – 12 pm</span>
           </button>
-          <button class="time-btn active" id="time-afternoon-${viewId}" onclick="setTime('${viewId}','afternoon')"
+          <button id="time-afternoon-${viewId}" onclick="setTime('${viewId}','afternoon')"
             style="flex:1;min-width:100px;padding:12px 8px;border-radius:12px;border:1.5px solid #6366f1;background:#ede9fe;font-size:13px;font-weight:600;cursor:pointer;text-align:center;color:#5b21b6;">
-            ☀️<br><strong>Afternoon</strong><br><span style="font-size:11px;">12–5 pm</span>
+            ☀️<br><strong>Afternoon</strong><br><span style="font-size:11px;">12 pm – 5 pm</span>
           </button>
-          <button class="time-btn" id="time-evening-${viewId}" onclick="setTime('${viewId}','evening')"
+          <button id="time-evening-${viewId}" onclick="setTime('${viewId}','evening')"
             style="flex:1;min-width:100px;padding:12px 8px;border-radius:12px;border:1.5px solid #d1d5db;background:#fff;font-size:13px;font-weight:600;cursor:pointer;text-align:center;">
-            🌙<br><strong>Evening</strong><br><span style="font-size:11px;color:#888;">5–8 pm</span>
+            🌙<br><strong>Evening</strong><br><span style="font-size:11px;color:#888;">5 pm – 8 pm</span>
           </button>
         </div>
       </div>
@@ -1031,6 +1015,23 @@
     if (ct) ct.style.display = v===2 ? 'block' : 'none';
     const btn = document.getElementById('sub-'+vid);
     if (btn && !btn.disabled) btn.textContent = v===1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+  }
+
+  // Global toggle from the floating pill — applies to whichever view is active
+  function setGlobalVer(v) {
+    // Update pill button styles
+    const b1 = document.getElementById('fc-vbtn1');
+    const b2 = document.getElementById('fc-vbtn2');
+    if (b1) { b1.style.background = v===1?'#fff':'transparent'; b1.style.color = v===1?'#00A651':'#9ca3af'; b1.style.boxShadow = v===1?'0 1px 4px rgba(0,0,0,.2)':'none'; }
+    if (b2) { b2.style.background = v===2?'#fff':'transparent'; b2.style.color = v===2?'#6366f1':'#9ca3af'; b2.style.boxShadow = v===2?'0 1px 4px rgba(0,0,0,.2)':'none'; }
+    const lbl = document.getElementById('fc-ver-label');
+    if (lbl) lbl.textContent = 'V'+v;
+    // Apply to both views so toggling view after setting version stays consistent
+    ['mobile','desktop'].forEach(vid => {
+      vState[vid].ver = v;
+      const btn = document.getElementById('sub-'+vid);
+      if (btn && !btn.disabled) btn.textContent = v===1 ? '🔍 Scan My Policy & Get a Quote' : '📤 Submit My Document';
+    });
   }
 
   function setTime(vid, t) {
