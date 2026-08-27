@@ -803,7 +803,7 @@
     <div style="background:linear-gradient(135deg,#00A651 0%,#007A3C 100%);padding:44px 28px 38px;text-align:center;color:#fff;">
       <div style="font-size:38px;font-weight:900;line-height:1.1;">We've Got You Covered!</div>
     </div>`;
-    if (v.ver === 2) {
+    if (v.ver === 1) {  // V1 Drop & Go — thank you, call scheduled
       return banner + `
       <div class="td-upload-section" style="text-align:center;padding-top:40px;">
         <span style="font-size:80px;display:block;margin-bottom:16px;">✉️</span>
@@ -916,7 +916,7 @@
         const sb = document.getElementById('sub-mobile');
         if (sb) sb.textContent = sv.ver === 1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
         const ct = document.getElementById('calltime-mobile');
-        if (ct) ct.style.display = sv.ver === 1 ? 'block' : 'none';
+        if (ct) ct.style.display = 'block';
         // Scroll the screen div to top AFTER it is visible
         requestAnimationFrame(() => { td.scrollTop = 0; });
       } else {
@@ -939,7 +939,7 @@
         const db = document.getElementById('sub-desktop');
         if (db) db.textContent = dv.ver === 1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
         const dc = document.getElementById('calltime-desktop');
-        if (dc) dc.style.display = dv.ver === 1 ? 'block' : 'none';
+        if (dc) dc.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'instant' });
         document.getElementById('desktop-stage').scrollTop = 0;
       } else {
@@ -1032,7 +1032,7 @@
     const desc = document.getElementById('ver-desc-'+vid);
     if (desc) desc.textContent = v===1 ? 'V1 · Drop & Go — upload and we\'ll call you at your preferred time' : 'V2 · Wait & Review — scan results shown immediately';
     const ct = document.getElementById('calltime-'+vid);
-    if (ct) ct.style.display = v===1 ? 'block' : 'none';
+    if (ct) ct.style.display = 'block'; // always visible
     const btn = document.getElementById('sub-'+vid);
     if (btn && !btn.disabled) btn.textContent = v===1 ? '📤 Submit My Document' : '🔍 Scan My Policy & Get a Quote';
   }
