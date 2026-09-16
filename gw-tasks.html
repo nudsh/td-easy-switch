@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PolicyCenter — Activities</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, "Helvetica Neue", sans-serif; font-size: 13px; background: #f0f0f0; color: #222; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── TOP NAV ── */
+    .gw-topnav {
+      background: #1e2d4a;
+      height: 36px;
+      display: flex; align-items: center;
+      padding: 0 10px;
+      gap: 0;
+      flex-shrink: 0;
+    }
+    .gw-logo {
+      display: flex; align-items: center; gap: 6px;
+      color: #fff; font-size: 14px; font-weight: 700;
+      padding: 0 12px 0 4px;
+      border-right: 1px solid rgba(255,255,255,.2);
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .gw-logo-icon {
+      width: 22px; height: 22px; background: #00b0a0;
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 900; color: #fff;
+    }
+    .gw-nav-item {
+      color: #c8d4e8; font-size: 12px; padding: 0 10px;
+      height: 36px; display: flex; align-items: center; gap: 3px;
+      cursor: pointer; white-space: nowrap; border-right: 1px solid rgba(255,255,255,.08);
+      transition: background .1s;
+    }
+    .gw-nav-item:hover, .gw-nav-item.active { background: rgba(255,255,255,.12); color: #fff; }
+    .gw-nav-arrow { font-size: 9px; opacity: .7; }
+    .gw-topnav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .gw-search {
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+      color: #fff; padding: 3px 8px; border-radius: 3px; font-size: 11px; width: 160px;
+    }
+    .gw-search::placeholder { color: rgba(255,255,255,.5); }
+    .gw-icon-btn { color: #c8d4e8; cursor: pointer; font-size: 14px; padding: 0 4px; }
+    .gw-icon-btn:hover { color: #fff; }
+
+    /* ── CONTEXT BAR ── */
+    .gw-context-bar {
+      background: #fff;
+      border-bottom: 1px solid #d0d0d0;
+      padding: 4px 12px;
+      display: flex; align-items: center; gap: 16px;
+      font-size: 11px; color: #444;
+      flex-shrink: 0;
+    }
+    .gw-context-item { display: flex; align-items: center; gap: 4px; }
+    .gw-context-label { color: #666; }
+    .gw-context-value { color: #1a5276; font-weight: 600; cursor: pointer; }
+    .gw-context-value:hover { text-decoration: underline; }
+    .gw-status-badge {
+      background: #e8f4fd; color: #1a5276; border: 1px solid #aed6f1;
+      padding: 1px 8px; border-radius: 3px; font-size: 11px; font-weight: 700;
+    }
+    .gw-status-badge.new { background: #eafaf1; color: #1e8449; border-color: #a9dfbf; }
+
+    /* ── BODY LAYOUT ── */
+    .gw-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── SIDEBAR ── */
+    .gw-sidebar {
+      width: 200px; background: #2d3748; color: #e2e8f0;
+      flex-shrink: 0; display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .gw-sidebar-actions {
+      background: #2ecc71; color: #fff; font-weight: 700; font-size: 12px;
+      padding: 8px 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .gw-sidebar-actions:hover { background: #27ae60; }
+    .gw-sidebar-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; cursor: pointer; font-size: 12px; color: #cbd5e0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      transition: background .1s;
+    }
+    .gw-sidebar-item:hover { background: rgba(255,255,255,.08); }
+    .gw-sidebar-item.active { background: #4a6fa5; color: #fff; }
+    .gw-sidebar-item-left { display: flex; align-items: center; gap: 8px; }
+    .gw-sidebar-icon { font-size: 13px; width: 16px; text-align: center; }
+    .gw-sidebar-count {
+      background: #4a6fa5; color: #fff; border-radius: 10px;
+      padding: 0 6px; font-size: 10px; font-weight: 700; min-width: 18px; text-align: center;
+    }
+    .gw-sidebar-item.active .gw-sidebar-count { background: rgba(255,255,255,.25); }
+    .gw-sidebar-section { padding: 8px 14px 4px; font-size: 10px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: .8px; margin-top: 8px; }
+
+    /* ── MAIN ── */
+    .gw-main {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #f7f8fa;
+    }
+    .gw-page-header {
+      background: #fff; border-bottom: 1px solid #ddd;
+      padding: 8px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .gw-page-title { font-size: 16px; font-weight: 700; color: #1a2b4a; }
+    .gw-toolbar { display: flex; align-items: center; gap: 6px; }
+    .gw-btn {
+      border: 1px solid #bbb; background: #fff; color: #333;
+      padding: 4px 12px; border-radius: 3px; font-size: 12px; cursor: pointer;
+      transition: background .1s;
+    }
+    .gw-btn:hover { background: #f0f0f0; }
+    .gw-btn.primary { background: #2ecc71; border-color: #27ae60; color: #fff; font-weight: 700; }
+    .gw-btn.primary:hover { background: #27ae60; }
+
+    /* ── FILTER BAR ── */
+    .gw-filter-bar {
+      padding: 8px 16px; background: #fff; border-bottom: 1px solid #e8e8e8;
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+    .gw-filter-label { font-size: 12px; color: #555; }
+    .gw-filter-select {
+      border: 1px solid #bbb; background: #fff; padding: 3px 24px 3px 8px;
+      border-radius: 3px; font-size: 12px; cursor: pointer; color: #333;
+      appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 6px center;
+    }
+
+    /* ── TABLE ── */
+    .gw-table-wrap { flex: 1; overflow: auto; padding: 12px 16px; }
+    .gw-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    .gw-table thead th {
+      background: #e8ecf0; color: #444; font-size: 11px; font-weight: 700;
+      padding: 7px 10px; text-align: left; border-bottom: 2px solid #ccc;
+      white-space: nowrap; user-select: none; cursor: pointer;
+    }
+    .gw-table thead th:hover { background: #dde2e8; }
+    .gw-sort-icon { color: #999; font-size: 9px; margin-left: 3px; }
+    .gw-table tbody tr { border-bottom: 1px solid #eee; transition: background .1s; cursor: pointer; }
+    .gw-table tbody tr:last-child { border-bottom: none; }
+    .gw-table tbody tr:hover { background: #eef4fb; }
+    .gw-table tbody tr.highlight { background: #fef9e7; }
+    .gw-table td { padding: 8px 10px; font-size: 12px; vertical-align: middle; }
+    .gw-link { color: #1a5276; text-decoration: none; font-weight: 600; }
+    .gw-link:hover { text-decoration: underline; }
+    .gw-priority-urgent { color: #c0392b; font-weight: 700; }
+    .gw-priority-normal { color: #555; }
+    .gw-date-overdue { color: #c0392b; }
+    .gw-date-today { color: #e67e22; font-weight: 600; }
+    .gw-date-ok { color: #27ae60; }
+    .cb-wrap { display: flex; align-items: center; justify-content: center; }
+    input[type=checkbox] { width: 13px; height: 13px; cursor: pointer; }
+    .gw-star { color: #ddd; cursor: pointer; font-size: 14px; }
+    .gw-star.filled { color: #f39c12; }
+    .gw-star:hover { color: #f39c12; }
+
+    /* Task type badge */
+    .gw-task-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #eaf2ff; color: #1a5276; border: 1px solid #aed6f1;
+      padding: 2px 7px; border-radius: 3px; font-size: 11px; font-weight: 600;
+    }
+    .gw-task-badge.new-quote { background: #eafaf1; color: #1e8449; border-color: #a9dfbf; }
+    .gw-task-badge.review { background: #fef9e7; color: #9a7d0a; border-color: #f9e79f; }
+    .gw-task-badge.follow-up { background: #fdf2f8; color: #7d3c98; border-color: #e8daef; }
+
+    /* ── PAGINATION ── */
+    .gw-pagination {
+      padding: 8px 16px; background: #fff; border-top: 1px solid #ddd;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 11px; color: #666; flex-shrink: 0;
+    }
+    .gw-page-btns { display: flex; gap: 4px; }
+    .gw-page-btn { border: 1px solid #ccc; background: #fff; padding: 2px 8px; border-radius: 3px; font-size: 11px; cursor: pointer; }
+    .gw-page-btn.active { background: #1a2b4a; color: #fff; border-color: #1a2b4a; }
+
+    /* ── NEW QUOTE HIGHLIGHT RING ── */
+    .gw-new-task-row td:first-child { border-left: 3px solid #2ecc71; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <div class="gw-topnav">
+    <div class="gw-logo">
+      <div class="gw-logo-icon">G</div>
+      PolicyCenter™
+    </div>
+    <div class="gw-nav-item active">Desktop <span class="gw-nav-arrow">▼</span></div>
+    <div class="gw-nav-item">Account <span class="gw-nav-arrow">▼</span></div>
+    <div class="gw-nav-item">Policy <span class="gw-nav-arrow">▼</span></div>
+    <div class="gw-nav-item">Contact <span class="gw-nav-arrow">▼</span></div>
+    <div class="gw-nav-item">Search <span class="gw-nav-arrow">▼</span></div>
+    <div class="gw-nav-item">Team</div>
+    <div class="gw-nav-item">Utility <span class="gw-nav-arrow">▼</span></div>
+    <div class="gw-nav-item">Administration <span class="gw-nav-arrow">▼</span></div>
+    <div class="gw-topnav-right">
+      <span class="gw-icon-btn">⚙</span>
+      <input class="gw-search" type="text" placeholder="Go to  (Alt+/)"/>
+    </div>
+  </div>
+
+  <!-- CONTEXT BAR -->
+  <div class="gw-context-bar">
+    <div class="gw-context-item">
+      <span class="gw-context-label">Logged in as:</span>
+      <span class="gw-context-value">Lupita Ramirez</span>
+    </div>
+    <div class="gw-context-item">
+      <span class="gw-context-label">Role:</span>
+      <span>Auto Insurance Advisor</span>
+    </div>
+    <div class="gw-context-item">
+      <span class="gw-context-label">Team:</span>
+      <span class="gw-context-value">Ontario Personal Lines</span>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+      <span class="gw-status-badge new">1 New Assignment</span>
+      <span style="font-size:11px;color:#888;">Last refresh: just now</span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="gw-body">
+
+    <!-- SIDEBAR -->
+    <div class="gw-sidebar">
+      <div class="gw-sidebar-actions">Actions ≡</div>
+      <div class="gw-sidebar-item active">
+        <div class="gw-sidebar-item-left"><span class="gw-sidebar-icon">📋</span> Activities</div>
+        <span class="gw-sidebar-count">6</span>
+      </div>
+      <div class="gw-sidebar-item">
+        <div class="gw-sidebar-item-left"><span class="gw-sidebar-icon">📄</span> Quotes</div>
+        <span class="gw-sidebar-count">3</span>
+      </div>
+      <div class="gw-sidebar-item">
+        <div class="gw-sidebar-item-left"><span class="gw-sidebar-icon">📁</span> Policies</div>
+        <span class="gw-sidebar-count">12</span>
+      </div>
+      <div class="gw-sidebar-item">
+        <div class="gw-sidebar-item-left"><span class="gw-sidebar-icon">👥</span> Accounts</div>
+        <span class="gw-sidebar-count">0</span>
+      </div>
+      <div class="gw-sidebar-item">
+        <div class="gw-sidebar-item-left"><span class="gw-sidebar-icon">📅</span> Calendar ▼</div>
+      </div>
+      <div class="gw-sidebar-section">Tools</div>
+      <div class="gw-sidebar-item">
+        <div class="gw-sidebar-item-left"><span class="gw-sidebar-icon">📝</span> Notes</div>
+      </div>
+      <div class="gw-sidebar-item">
+        <div class="gw-sidebar-item-left"><span class="gw-sidebar-icon">📎</span> Documents</div>
+      </div>
+      <div class="gw-sidebar-item">
+        <div class="gw-sidebar-item-left"><span class="gw-sidebar-icon">🕐</span> History</div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="gw-main">
+      <div class="gw-page-header">
+        <div class="gw-page-title">Activities</div>
+        <div class="gw-toolbar">
+          <button class="gw-btn">Assign</button>
+          <button class="gw-btn">Skip</button>
+          <button class="gw-btn">Complete</button>
+          <span style="color:#ccc;">|</span>
+          <button class="gw-btn">Approve</button>
+          <button class="gw-btn">Reject</button>
+          <button class="gw-btn primary">Export ↓</button>
+        </div>
+      </div>
+
+      <div class="gw-filter-bar">
+        <span class="gw-filter-label">View:</span>
+        <select class="gw-filter-select">
+          <option>My activities today</option>
+          <option>All open activities</option>
+          <option>New quote requests</option>
+          <option>Overdue</option>
+        </select>
+        <span style="margin-left:auto;font-size:11px;color:#888;">6 activities · sorted by Due Date</span>
+      </div>
+
+      <div class="gw-table-wrap">
+        <table class="gw-table">
+          <thead>
+            <tr>
+              <th style="width:28px;"><div class="cb-wrap"><input type="checkbox"/></div></th>
+              <th style="width:22px;">★</th>
+              <th>Due <span class="gw-sort-icon">⇅</span></th>
+              <th>Priority <span class="gw-sort-icon">⇅</span></th>
+              <th>Subject <span class="gw-sort-icon">⇅</span></th>
+              <th>Type <span class="gw-sort-icon">⇅</span></th>
+              <th>Account / Insured <span class="gw-sort-icon">⇅</span></th>
+              <th>LOB <span class="gw-sort-icon">⇅</span></th>
+              <th>Province <span class="gw-sort-icon">⇅</span></th>
+              <th>Assigned To <span class="gw-sort-icon">⇅</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- ✅ NEW EASY SWITCH TASK — highlighted -->
+            <tr class="gw-new-task-row" onclick="window.location='gw-policy-intake.html'" title="Open quote intake">
+              <td><div class="cb-wrap"><input type="checkbox" onclick="event.stopPropagation()"/></div></td>
+              <td><span class="gw-star filled" onclick="event.stopPropagation()">★</span></td>
+              <td><span class="gw-date-today">Today</span></td>
+              <td><span class="gw-priority-urgent">Urgent</span></td>
+              <td><a class="gw-link" href="gw-policy-intake.html">New Quote Request — Easy Switch <span style="font-size:10px;background:#2ecc71;color:#fff;padding:1px 5px;border-radius:2px;margin-left:4px;">NEW</span></a></td>
+              <td><span class="gw-task-badge new-quote">🛡 Quote</span></td>
+              <td><a class="gw-link" href="gw-policy-intake.html">Sarah Johnson</a><br><span style="color:#888;font-size:11px;">Acct: C000198731</span></td>
+              <td>Personal Auto</td>
+              <td>ON</td>
+              <td>Lupita Ramirez</td>
+            </tr>
+            <!-- Existing tasks -->
+            <tr>
+              <td><div class="cb-wrap"><input type="checkbox"/></div></td>
+              <td><span class="gw-star">★</span></td>
+              <td><span class="gw-date-overdue">Sep 10, 2026</span></td>
+              <td><span class="gw-priority-urgent">Urgent</span></td>
+              <td><a class="gw-link" href="#">Policy renewal follow-up</a></td>
+              <td><span class="gw-task-badge follow-up">↻ Renewal</span></td>
+              <td><a class="gw-link" href="#">Michael Tremblay</a><br><span style="color:#888;font-size:11px;">Acct: C000182041</span></td>
+              <td>Personal Auto</td>
+              <td>ON</td>
+              <td>Lupita Ramirez</td>
+            </tr>
+            <tr>
+              <td><div class="cb-wrap"><input type="checkbox"/></div></td>
+              <td><span class="gw-star">★</span></td>
+              <td><span class="gw-date-overdue">Sep 11, 2026</span></td>
+              <td><span class="gw-priority-urgent">Urgent</span></td>
+              <td><a class="gw-link" href="#">Endorsement review — OPCF 20</a></td>
+              <td><span class="gw-task-badge review">✎ Review</span></td>
+              <td><a class="gw-link" href="#">Aisha Fernandez</a><br><span style="color:#888;font-size:11px;">Acct: C000175302</span></td>
+              <td>Personal Auto</td>
+              <td>ON</td>
+              <td>Lupita Ramirez</td>
+            </tr>
+            <tr>
+              <td><div class="cb-wrap"><input type="checkbox"/></div></td>
+              <td><span class="gw-star filled">★</span></td>
+              <td><span class="gw-date-ok">Sep 18, 2026</span></td>
+              <td><span class="gw-priority-normal">Normal</span></td>
+              <td><a class="gw-link" href="#">Initial 30-day file review</a></td>
+              <td><span class="gw-task-badge review">✎ Review</span></td>
+              <td><a class="gw-link" href="#">David Leblanc</a><br><span style="color:#888;font-size:11px;">Acct: C000161209</span></td>
+              <td>Personal Auto</td>
+              <td>ON</td>
+              <td>Lupita Ramirez</td>
+            </tr>
+            <tr>
+              <td><div class="cb-wrap"><input type="checkbox"/></div></td>
+              <td><span class="gw-star">★</span></td>
+              <td><span class="gw-date-ok">Sep 20, 2026</span></td>
+              <td><span class="gw-priority-normal">Normal</span></td>
+              <td><a class="gw-link" href="#">Quote — new business referral</a></td>
+              <td><span class="gw-task-badge new-quote">🛡 Quote</span></td>
+              <td><a class="gw-link" href="#">Carlos Reyes</a><br><span style="color:#888;font-size:11px;">Acct: C000199042</span></td>
+              <td>Personal Auto</td>
+              <td>ON</td>
+              <td>Lupita Ramirez</td>
+            </tr>
+            <tr>
+              <td><div class="cb-wrap"><input type="checkbox"/></div></td>
+              <td><span class="gw-star">★</span></td>
+              <td><span class="gw-date-ok">Sep 22, 2026</span></td>
+              <td><span class="gw-priority-normal">Normal</span></td>
+              <td><a class="gw-link" href="#">Homeowner bundle review</a></td>
+              <td><span class="gw-task-badge review">✎ Review</span></td>
+              <td><a class="gw-link" href="#">Jessica Kowalski</a><br><span style="color:#888;font-size:11px;">Acct: C000188774</span></td>
+              <td>Home + Auto</td>
+              <td>ON</td>
+              <td>Lupita Ramirez</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="gw-pagination">
+        <span>Showing 1–6 of 6 activities</span>
+        <div class="gw-page-btns">
+          <button class="gw-page-btn">◀</button>
+          <button class="gw-page-btn active">1</button>
+          <button class="gw-page-btn">▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
