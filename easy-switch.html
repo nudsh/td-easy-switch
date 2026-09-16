@@ -774,20 +774,20 @@
       <div class="data-card">
         <div class="data-card-header">👤 Personal Information</div>
         <div class="data-row"><span class="data-key">Name</span><span class="data-val">${fname} ${lname}</span></div>
-        <div class="data-row"><span class="data-key">Address</span><span class="data-val">42 Maple Ave, Toronto ON</span></div>
+        <div class="data-row"><span class="data-key">Address</span><span class="data-val">142 Maple Ridge Drive, Oakville ON</span></div>
       </div>
       <div class="data-card">
         <div class="data-card-header">🚗 Vehicle</div>
-        <div class="data-row"><span class="data-key">Vehicle</span><span class="data-val">2021 Honda Civic LX</span></div>
-        <div class="data-row"><span class="data-key">VIN</span><span class="data-val">2HGFE2F59MH502841</span></div>
+        <div class="data-row"><span class="data-key">Vehicle</span><span class="data-val">2021 Toyota RAV4 XLE AWD</span></div>
+        <div class="data-row"><span class="data-key">VIN</span><span class="data-val">2T3BFREV5MW185293</span></div>
       </div>
       <div class="data-card">
         <div class="data-card-header">🛡️ Current Coverage</div>
-        <div class="data-row"><span class="data-key">Insurer</span><span class="data-val">Aviva Canada</span></div>
+        <div class="data-row"><span class="data-key">Insurer</span><span class="data-val">Intact Insurance</span></div>
         <div class="data-row"><span class="data-key">Coverage</span><span class="data-val">Comprehensive + Collision</span></div>
         <div class="data-row"><span class="data-key">Liability</span><span class="data-val">$2,000,000</span></div>
         <div class="data-row"><span class="data-key">Deductible</span><span class="data-val">$500 / $1,000</span></div>
-        <div class="data-row"><span class="data-key">Policy Expires</span><span class="data-val">March 15, 2026</span></div>
+        <div class="data-row"><span class="data-key">Policy Expires</span><span class="data-val">January 1, 2026</span></div>
       </div>
       <div class="confirm-question">Does everything look correct?</div>
       <div class="confirm-btns">
@@ -990,7 +990,7 @@
   }
   function submitForm(vid) {
     const fname = (document.getElementById('td-fname-'+vid).value.trim()) || 'John';
-    const lname = (document.getElementById('td-lname-'+vid).value.trim()) || 'Smith';
+    const lname = (document.getElementById('td-lname-'+vid).value.trim()) || 'Pierce';
     const btn = document.getElementById('sub-'+vid);
     const ver = (vState[vid] || {}).ver || 1;
 
